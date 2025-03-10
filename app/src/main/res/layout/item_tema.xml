@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/textTema"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="Tema"
+        android:textSize="16sp" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioFavor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="A favor" />
+
+        <RadioButton
+            android:id="@+id/radioContra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="En contra" />
+
+        <RadioButton
+            android:id="@+id/radioIndiferente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Indiferente"
+            android:checked="true"/>
+    </RadioGroup>
+
+</LinearLayout>
