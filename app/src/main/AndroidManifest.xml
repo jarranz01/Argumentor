@@ -6,7 +6,9 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Argumentor"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
+        android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
+
+        <!-- Login activity -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -15,15 +17,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- Actividad principal de la app -->
+
+        <!-- Formulario activity -->
         <activity
             android:name=".FormularioActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:exported="false">
         </activity>
     </application>
 
