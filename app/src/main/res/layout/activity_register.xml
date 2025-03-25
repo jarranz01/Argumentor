@@ -9,14 +9,32 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Argumentor"
+        android:text="Registro"
         android:textSize="28sp"
         android:textStyle="bold"
         android:gravity="center"
         android:layout_marginBottom="48dp"/>
 
     <EditText
-        android:id="@+id/editTextUsername"
+        android:id="@+id/editTextName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nombre Completo"
+        android:inputType="text"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/editTextEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Correo Electrónico"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/editTextRegisterUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Nombre de usuario"
@@ -25,7 +43,7 @@
         android:layout_marginBottom="16dp"/>
 
     <EditText
-        android:id="@+id/editTextPassword"
+        android:id="@+id/editTextRegisterPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Contraseña"
@@ -34,18 +52,16 @@
         android:layout_marginBottom="24dp"/>
 
     <Button
-        android:id="@+id/buttonLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Iniciar Sesión"
-        android:padding="12dp"/>
-    <Button
-        android:id="@+id/buttonGoToRegister"
+        android:id="@+id/buttonRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Registrarse"
-        android:padding="12dp"
-        android:layout_marginTop="16dp"/>
-
+        android:padding="12dp"/>
+    <Button
+        android:id="@+id/buttonToLogIn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:padding="12dp"/>
 
 </LinearLayout>
