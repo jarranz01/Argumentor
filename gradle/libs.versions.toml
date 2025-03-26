@@ -34,6 +34,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 material-v1120 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+timber = {module = "com.jakewharton.timber:timber", version = "5.0.1"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

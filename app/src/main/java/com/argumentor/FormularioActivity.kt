@@ -81,8 +81,8 @@ class FormularioActivity : AppCompatActivity() {
                 loadingOverlay.visibility = View.GONE
 
                 // Navegar a la siguiente actividad
-                // val intent = Intent(this, SiguienteActivity::class.java)
-                // startActivity(intent)
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
 
                 // Por ahora solo mostraremos un mensaje
                 // Toast.makeText(this, "Opiniones guardadas", Toast.LENGTH_SHORT).show()

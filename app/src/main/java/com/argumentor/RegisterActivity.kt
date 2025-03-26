@@ -6,6 +6,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import timber.log.Timber
+
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -15,6 +17,8 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var editTextPassword: EditText
     private lateinit var buttonRegister: Button
     private lateinit var buttonToLogin: Button
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +37,7 @@ class RegisterActivity : AppCompatActivity() {
         buttonToLogin.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
+            Timber.i("Go to login menu")
         }
         // Manejar clic en el botón de registro
         buttonRegister.setOnClickListener {
@@ -43,6 +48,7 @@ class RegisterActivity : AppCompatActivity() {
 
             if (name.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
+                Timber.i("Empty fields")
             } else {
                 // Aquí puedes manejar el registro (guardar en BD, Firebase, etc.)
                 Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
@@ -51,6 +57,7 @@ class RegisterActivity : AppCompatActivity() {
                 val intent = Intent(this, FormularioActivity::class.java)
                 startActivity(intent)
                 finish()
+                Timber.i("Register Correct")
             }
         }
     }
