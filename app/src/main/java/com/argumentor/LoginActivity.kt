@@ -2,50 +2,39 @@ package com.argumentor
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import com.argumentor.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var editTextUsername: EditText
-    private lateinit var editTextPassword: EditText
-    private lateinit var buttonLogin: Button
-    private lateinit var buttonGoToRegister: Button
+    private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
 
-        // Initialize UI elements
-        editTextUsername = findViewById(R.id.editTextUsername)
-        editTextPassword = findViewById(R.id.editTextPassword)
-        buttonLogin = findViewById(R.id.buttonLogin)
-        buttonGoToRegister = findViewById(R.id.buttonGoToRegister)
+        // Vincular Data Binding con la vista
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
 
-        buttonGoToRegister.setOnClickListener {
+        // Navegar al RegisterActivity
+        binding.buttonGoToRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
 
-        // Set click listener for login button
-        buttonLogin.setOnClickListener {
-            val username = editTextUsername.text.toString().trim()
-            val password = editTextPassword.text.toString().trim()
+        // Manejar el inicio de sesión
+        binding.buttonLogin.setOnClickListener {
+            val username = binding.editTextUsername.text.toString().trim()
+            val password = binding.editTextPassword.text.toString().trim()
 
-            // Simple validation
             if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(
-                    this,
-                    "Por favor, complete todos los campos",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
             } else {
-                // For now, just navigate to the next screen without saving or checking credentials
+                // Ir a la pantalla del formulario
                 val intent = Intent(this, FormularioActivity::class.java)
                 startActivity(intent)
-                finish() // Close login activity so user can't go back with back button
+                finish() // Evita volver atrás al login
             }
         }
     }
