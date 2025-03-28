@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Textos comunes -->
+    <string name="ok">Aceptar</string>
+    <string name="understood">Entendido</string>
+    <string name="continue_button">CONTINUAR</string>
+
+    <!-- Opciones de opinión -->
+    <string name="opinion_favor">A favor</string>
+    <string name="opinion_against">En contra</string>
+    <string name="opinion_neutral">Indiferente</string>
+
+    <!-- Login y registro -->
+    <string name="login_title">Iniciar sesión</string>
+    <string name="register_title">Registro</string>
+    <string name="username_hint">Nombre de usuario</string>
+    <string name="password_hint">Contraseña</string>
+    <string name="fullname_hint">Nombre Completo</string>
+    <string name="email_hint">Correo Electrónico</string>
+    <string name="login_button">Iniciar Sesión</string>
+    <string name="register_button">Registrarse</string>
+    <string name="empty_fields_error">Por favor, complete todos los campos</string>
+    <string name="registration_successful">Registro exitoso</string>
+
+    <!-- Formulario -->
+    <string name="form_title">Tus opiniones</string>
+    <string name="form_subtitle">Selecciona tu postura sobre los siguientes temas para el debate</string>
+    <string name="player_default_name">Jugador 1</string>
+
+    <!-- Temas -->
+    <string name="climate_change">Cambio climático</string>
+    <string name="climate_change_description">Este tema aborda la existencia y la realidad del cambio climático, un fenómeno que se refiere a las variaciones significativas y duraderas en los patrones climáticos de la Tierra. El debate se centra en si el cambio climático es un hecho comprobado o una teoría sin suficiente evidencia.</string>
+
+    <string name="nuclear_energy">Energía nuclear</string>
+    <string name="nuclear_energy_description">Este tema se centra en el uso de la energía nuclear como fuente de electricidad. El debate gira en torno a sus ventajas y desventajas, incluyendo la seguridad, la gestión de residuos y su papel en la transición energética.</string>
+
+    <string name="social_media">Redes sociales</string>
+    <string name="social_media_description">Este tema explora el impacto del uso diario de las redes sociales en la vida de las personas. Se discuten tanto los beneficios como los perjuicios de su uso constante.</string>
+
+    <string name="online_education">Educación online</string>
+    <string name="online_education_description">Este tema se centra en la educación a distancia a través de plataformas digitales. Se debate sobre su efectividad, accesibilidad y las diferencias con la educación tradicional.</string>
+
+    <string name="artificial_intelligence">Inteligencia artificial</string>
+    <string name="abortion">Aborto</string>
+    <string name="bullfighting">Tauromaquia</string>
+    <string name="film_subsidies">Subvenciones al cine</string>
+    <string name="open_borders">Fronteras abiertas</string>
+    <string name="freedom_of_speech">Libertad de expresión</string>
+    <string name="marijuana">Marihuana</string>
+</resources>

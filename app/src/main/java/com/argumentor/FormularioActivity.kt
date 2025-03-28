@@ -43,23 +43,19 @@ class FormularioActivity : AppCompatActivity() {
         // Crear un jugador con una lista de temas
         jugador = Jugador(
             id = "1",
-            nombre = "Jugador 1",
+            nombre = getString(R.string.player_default_name),
             listaTemas = mutableListOf(
-                Tema("Cambio climático",
-                    "Este tema aborda la existencia y la realidad del cambio climático, un fenómeno que se refiere a las variaciones significativas y duraderas en los patrones climáticos de la Tierra. El debate se centra en si el cambio climático es un hecho comprobado o una teoría sin suficiente evidencia."),
-                Tema("Energía nuclear",
-                    "Este tema se centra en el uso de la energía nuclear como fuente de electricidad. El debate gira en torno a sus ventajas y desventajas, incluyendo la seguridad, la gestión de residuos y su papel en la transición energética."),
-                Tema("Redes sociales",
-                    "Este tema explora el impacto del uso diario de las redes sociales en la vida de las personas. Se discuten tanto los beneficios como los perjuicios de su uso constante."),
-                Tema("Educación online",
-                    "Este tema se centra en la educación a distancia a través de plataformas digitales. Se debate sobre su efectividad, accesibilidad y las diferencias con la educación tradicional."),
-                Tema("Inteligencia artificial"),
-                Tema("Aborto"),
-                Tema("Tauromaquia"),
-                Tema("Subvenciones al cine"),
-                Tema("Fronteras abiertas"),
-                Tema("Libertad de expresión"),
-                Tema("Marihuana")
+                Tema(getString(R.string.climate_change), getString(R.string.climate_change_description)),
+                Tema(getString(R.string.nuclear_energy), getString(R.string.nuclear_energy_description)),
+                Tema(getString(R.string.social_media), getString(R.string.social_media_description)),
+                Tema(getString(R.string.online_education), getString(R.string.online_education_description)),
+                Tema(getString(R.string.artificial_intelligence)),
+                Tema(getString(R.string.abortion)),
+                Tema(getString(R.string.bullfighting)),
+                Tema(getString(R.string.film_subsidies)),
+                Tema(getString(R.string.open_borders)),
+                Tema(getString(R.string.freedom_of_speech)),
+                Tema(getString(R.string.marijuana))
             )
         )
 

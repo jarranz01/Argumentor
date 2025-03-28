@@ -53,21 +53,21 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="A favor" />
+                android:text="@string/opinion_favor" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radioContra"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="En contra" />
+                android:text="@string/opinion_against" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radioIndiferente"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Indiferente"
+                android:text="@string/opinion_neutral"
                 android:checked="true"/>
         </RadioGroup>
     </LinearLayout>
