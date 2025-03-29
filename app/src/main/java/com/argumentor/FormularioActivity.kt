@@ -14,6 +14,7 @@ import com.google.android.material.button.MaterialButton
 import com.argumentor.models.Jugador
 import com.argumentor.models.Tema
 import com.argumentor.R
+import timber.log.Timber
 
 class FormularioActivity : AppCompatActivity() {
 
@@ -84,5 +85,29 @@ class FormularioActivity : AppCompatActivity() {
                 // Toast.makeText(this, "Opiniones guardadas", Toast.LENGTH_SHORT).show()
             }, 1500)
         }
+    }
+    override fun onStart() {
+        super.onStart()
+        Timber.i("onStart called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Timber.i("onResume called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Timber.i("onPause called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Timber.i("onStop called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.i("onDestroy called")
     }
 }
