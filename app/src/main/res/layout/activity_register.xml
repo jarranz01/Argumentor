@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Registro"
+            android:text="@string/register_title"
             android:textSize="28sp"
             android:textStyle="bold"
             android:gravity="center"
@@ -22,7 +22,7 @@
             android:id="@+id/editTextName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nombre Completo"
+            android:hint="@string/fullname_hint"
             android:inputType="text"
             android:padding="12dp"
             android:layout_marginBottom="16dp"/>
@@ -31,7 +31,7 @@
             android:id="@+id/editTextEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Correo Electrónico"
+            android:hint="@string/email_hint"
             android:inputType="textEmailAddress"
             android:padding="12dp"
             android:layout_marginBottom="16dp"/>
@@ -40,7 +40,7 @@
             android:id="@+id/editTextRegisterUsername"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nombre de usuario"
+            android:hint="@string/username_hint"
             android:inputType="text"
             android:padding="12dp"
             android:layout_marginBottom="16dp"/>
@@ -49,7 +49,7 @@
             android:id="@+id/editTextRegisterPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Contraseña"
+            android:hint="@string/password_hint"
             android:inputType="textPassword"
             android:padding="12dp"
             android:layout_marginBottom="24dp"/>
@@ -58,14 +58,14 @@
             android:id="@+id/buttonRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Registrarse"
+            android:text="@string/register_button"
             android:padding="12dp"/>
 
         <Button
             android:id="@+id/buttonToLogIn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Login"
+            android:text="@string/login_button"
             android:padding="12dp"/>
 
     </LinearLayout>

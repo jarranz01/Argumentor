@@ -33,11 +33,11 @@ class RegisterActivity : AppCompatActivity() {
             val password = binding.editTextRegisterPassword.text.toString().trim()
 
             if (name.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.empty_fields_error), Toast.LENGTH_SHORT).show()
                 Timber.i("Empty fields")
             } else {
                 // Aquí puedes manejar el registro (guardar en BD, Firebase, etc.)
-                Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.registration_successful), Toast.LENGTH_SHORT).show()
 
                 // Ir a la pantalla del formulario
                 val intent = Intent(this, FormularioActivity::class.java)

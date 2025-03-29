@@ -1,3 +1,51 @@
 <resources>
-    <string name="app_name">Argumentor</string>
+    <string name="app_name" translatable="false">Argumentor</string>
+
+    <!-- Textos comunes -->
+    <string name="ok">OK</string>
+    <string name="understood">Understood</string>
+    <string name="continue_button">CONTINUE</string>
+
+    <!-- Opciones de opinión -->
+    <string name="opinion_favor">In favor</string>
+    <string name="opinion_against">Against</string>
+    <string name="opinion_neutral">Neutral</string>
+
+    <!-- Login y registro -->
+    <string name="login_title">Login</string>
+    <string name="register_title">Register</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="fullname_hint">Full Name</string>
+    <string name="email_hint">Email</string>
+    <string name="login_button">Log In</string>
+    <string name="register_button">Register</string>
+    <string name="empty_fields_error">Please complete all fields</string>
+    <string name="registration_successful">Registration successful</string>
+
+    <!-- Formulario -->
+    <string name="form_title">Your opinions</string>
+    <string name="form_subtitle">Select your position on the following topics for debate</string>
+    <string name="player_default_name">Player 1</string>
+
+    <!-- Temas -->
+    <string name="climate_change">Climate Change</string>
+    <string name="climate_change_description">This topic addresses the existence and reality of climate change, a phenomenon that refers to significant and lasting variations in Earth\'s climate patterns. The debate focuses on whether climate change is a proven fact or a theory without sufficient evidence.</string>
+
+    <string name="nuclear_energy">Nuclear Energy</string>
+    <string name="nuclear_energy_description">This topic focuses on the use of nuclear energy as a source of electricity. The debate revolves around its advantages and disadvantages, including safety, waste management, and its role in the energy transition.</string>
+
+    <string name="social_media">Social Media</string>
+    <string name="social_media_description">This topic explores the impact of daily use of social media on people\'s lives. Both the benefits and harms of its constant use are discussed.</string>
+
+    <string name="online_education">Online Education</string>
+    <string name="online_education_description">This topic focuses on distance education through digital platforms. Its effectiveness, accessibility, and differences with traditional education are debated.</string>
+
+    <string name="artificial_intelligence">Artificial Intelligence</string>
+    <string name="abortion">Abortion</string>
+    <string name="bullfighting">Bullfighting</string>
+    <string name="film_subsidies">Film Subsidies</string>
+    <string name="open_borders">Open Borders</string>
+    <string name="freedom_of_speech">Freedom of Speech</string>
+    <string name="marijuana">Marijuana</string>
 </resources>

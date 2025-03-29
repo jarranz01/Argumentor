@@ -47,24 +47,30 @@ class TemaAdapter(
         private val textTema: TextView = itemView.findViewById(R.id.textTema)
         private val radioGroup: RadioGroup = itemView.findViewById(R.id.radioGroup)
         private val btnInfo: ImageButton = itemView.findViewById(R.id.btnInfo)
+        private val context = itemView.context
 
         fun bind(tema: Tema, onOpinionSelected: (String, String) -> Unit) {
             textTema.text = tema.nombre
 
+            // Obtener las cadenas de recursos
+            val favorStr = context.getString(R.string.opinion_favor)
+            val contraStr = context.getString(R.string.opinion_against)
+            val indiferenteStr = context.getString(R.string.opinion_neutral)
+
             // Establecer la opción seleccionada
             when (tema.opinionSeleccionada) {
-                "A favor" -> (itemView.findViewById<RadioButton>(R.id.radioFavor)).isChecked = true
-                "En contra" -> (itemView.findViewById<RadioButton>(R.id.radioContra)).isChecked = true
-                "Indiferente" -> (itemView.findViewById<RadioButton>(R.id.radioIndiferente)).isChecked = true
+                favorStr -> (itemView.findViewById<RadioButton>(R.id.radioFavor)).isChecked = true
+                contraStr -> (itemView.findViewById<RadioButton>(R.id.radioContra)).isChecked = true
+                indiferenteStr -> (itemView.findViewById<RadioButton>(R.id.radioIndiferente)).isChecked = true
             }
 
             // Escuchar cambios en la selección
             radioGroup.setOnCheckedChangeListener { _, checkedId ->
                 val opinion = when (checkedId) {
-                    R.id.radioFavor -> "A favor"
-                    R.id.radioContra -> "En contra"
-                    R.id.radioIndiferente -> "Indiferente"
-                    else -> "Indiferente"
+                    R.id.radioFavor -> favorStr
+                    R.id.radioContra -> contraStr
+                    R.id.radioIndiferente -> indiferenteStr
+                    else -> indiferenteStr
                 }
                 onOpinionSelected(tema.nombre, opinion)
             }
@@ -74,7 +80,7 @@ class TemaAdapter(
                 MaterialAlertDialogBuilder(itemView.context)
                     .setTitle(tema.nombre)
                     .setMessage(tema.descripcion)
-                    .setPositiveButton("Entendido", null)
+                    .setPositiveButton(R.string.understood, null)
                     .show()
             }
         }
