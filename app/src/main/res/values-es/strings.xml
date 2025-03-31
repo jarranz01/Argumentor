@@ -47,4 +47,23 @@
     <string name="open_borders">Fronteras abiertas</string>
     <string name="freedom_of_speech">Libertad de expresión</string>
     <string name="marijuana">Marihuana</string>
+
+    <!-- Home y Debate -->
+    <string name="welcome_message">Bienvenido a Argumentor</string>
+    <string name="matchmaking">Emparejamiento</string>
+    <string name="debate_board">Tablón de debates</string>
+    <string name="my_debates">Mis Debates</string>
+    <string name="my_stances">Mis Posturas</string>
+    <string name="settings">Ajustes</string>
+
+    <string name="no_debates_yet">No hay debates aún. ¡Crea uno!</string>
+    <string name="create_debate">Crear Debate</string>
+    <string name="debate_title">Título del debate</string>
+    <string name="debate_description">Describe el tema del debate…</string>
+    <string name="join_debate">Unirse al debate</string>
+    <string name="create">Crear</string>
+    <string name="cancel">Cancelar</string>
+    <string name="created_by">Creado por: %1$s</string>
+    <string name="current_user">Tú</string>
+    <string name="joined_debate">Te has unido al debate: %1$s</string>
 </resources>

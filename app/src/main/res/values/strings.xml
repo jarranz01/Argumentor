@@ -48,4 +48,24 @@
     <string name="open_borders">Open Borders</string>
     <string name="freedom_of_speech">Freedom of Speech</string>
     <string name="marijuana">Marijuana</string>
+
+    <!-- Home y Debate -->
+    <string name="welcome_message">Welcome to Argumentor</string>
+    <string name="matchmaking">Matchmaking</string>
+    <string name="debate_board">Debate Board</string>
+    <string name="my_debates">My Debates</string>
+    <string name="my_stances">My Stances</string>
+    <string name="settings">Settings</string>
+
+    <string name="no_debates_yet">No debates yet. Create one!</string>
+    <string name="create_debate">Create Debate</string>
+    <string name="debate_title">Debate Title</string>
+    <string name="debate_description">Describe the debate topic…</string>
+    <string name="join_debate">Join Debate</string>
+    <string name="create">Create</string>
+    <string name="cancel">Cancel</string>
+    <string name="created_by">Created by: %1$s</string>
+    <string name="current_user">You</string>
+    <string name="joined_debate">You joined the debate: %1$s</string>
+
 </resources>

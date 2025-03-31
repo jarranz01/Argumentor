@@ -39,7 +39,7 @@ class LoginActivity : AppCompatActivity() {
                 Timber.i("Login validation failed: empty fields")
             } else {
                 // Ir a la pantalla del formulario
-                val intent = Intent(this, FormularioActivity::class.java)
+                val intent = Intent(this, HomeActivity::class.java)
                 startActivity(intent)
                 finish() // Evita volver atrás al login
                 Timber.i("Login successful, navigating to form")
