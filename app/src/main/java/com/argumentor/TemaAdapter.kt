@@ -13,6 +13,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.argumentor.models.Tema
 import com.argumentor.R
 
+/**
+ * Adaptador para mostrar una lista de temas en un RecyclerView.
+ * 
+ * @param temas Lista de temas a mostrar.
+ * @param onOpinionSelected Callback que se ejecuta cuando se selecciona una opinión para un tema.
+ */
 class TemaAdapter(
     private val temas: List<Tema>,
     private val onOpinionSelected: (String, String) -> Unit
@@ -20,11 +26,17 @@ class TemaAdapter(
 
     private var lastPosition = -1
 
+    /**
+     * Crea un nuevo ViewHolder inflando el layout del item.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TemaViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_tema, parent, false)
         return TemaViewHolder(view)
     }
 
+    /**
+     * Vincula los datos del tema en la posición especificada con el ViewHolder.
+     */
     override fun onBindViewHolder(holder: TemaViewHolder, position: Int) {
         val tema = temas[position]
         holder.bind(tema, onOpinionSelected)
@@ -33,6 +45,12 @@ class TemaAdapter(
         setAnimation(holder.itemView, position)
     }
 
+    /**
+     * Aplica una animación al item cuando se muestra.
+     * 
+     * @param viewToAnimate Vista a animar.
+     * @param position Posición del item en la lista.
+     */
     private fun setAnimation(viewToAnimate: View, position: Int) {
         if (position > lastPosition) {
             val animation = AnimationUtils.loadAnimation(viewToAnimate.context, R.anim.item_animation)
@@ -41,14 +59,28 @@ class TemaAdapter(
         }
     }
 
+    /**
+     * @return El número total de temas en la lista.
+     */
     override fun getItemCount(): Int = temas.size
 
+    /**
+     * ViewHolder que representa un item de tema en la lista.
+     * 
+     * @property itemView Vista del item.
+     */
     class TemaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val textTema: TextView = itemView.findViewById(R.id.textTema)
         private val radioGroup: RadioGroup = itemView.findViewById(R.id.radioGroup)
         private val btnInfo: ImageButton = itemView.findViewById(R.id.btnInfo)
         private val context = itemView.context
 
+        /**
+         * Vincula los datos del tema con las vistas del ViewHolder.
+         * 
+         * @param tema El tema a mostrar.
+         * @param onOpinionSelected Callback para cuando se selecciona una opinión.
+         */
         fun bind(tema: Tema, onOpinionSelected: (String, String) -> Unit) {
             textTema.text = tema.nombre
 

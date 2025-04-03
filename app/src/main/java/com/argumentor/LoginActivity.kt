@@ -8,9 +8,21 @@ import androidx.databinding.DataBindingUtil
 import com.argumentor.databinding.ActivityLoginBinding
 import timber.log.Timber
 
+/**
+ * Actividad que maneja el inicio de sesión de usuarios.
+ * 
+ * Permite a los usuarios ingresar con su nombre de usuario y contraseña,
+ * o navegar a la pantalla de registro si no tienen una cuenta.
+ */
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var observer: MyObserver
+
+    /**
+     * Método llamado al crear la actividad. Inicializa el Data Binding y configura los listeners.
+     * 
+     * @param savedInstanceState Estado previo de la actividad si está siendo recreada.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         observer = MyObserver(this.lifecycle, "LoginActivity")
@@ -45,5 +57,4 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-
 }

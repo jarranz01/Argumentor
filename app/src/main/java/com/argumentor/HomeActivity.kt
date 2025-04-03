@@ -7,17 +7,40 @@ import androidx.databinding.DataBindingUtil
 import com.argumentor.databinding.ActivityHomeBinding
 import timber.log.Timber
 
+/**
+ * Actividad principal que sirve como hub de navegación para las diferentes funcionalidades de la app.
+ * 
+ * Esta actividad muestra los botones principales para acceder a:
+ * - Emparejamiento (Matchmaking)
+ * - Tablero de debates (Debate Board)
+ * - Mis debates (My Debates)
+ * - Mis posturas (My Stances)
+ * - Ajustes (Settings)
+ */
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
+    private lateinit var observer: MyObserver
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    /**
+     * Método llamado al crear la actividad. Inicializa el Data Binding y configura los listeners.
+     * 
+     * @param savedInstanceState Estado previo de la actividad si está siendo recreada.
+     */
+    override fun onCreate(savedInstanceState: Bundle?) {        
         super.onCreate(savedInstanceState)
+        observer = MyObserver(this.lifecycle, "LoginActivity")
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
 
         setupClickListeners()
     }
 
+    /**
+     * Configura los listeners para los botones de la interfaz.
+     * 
+     * Cada botón maneja la navegación a una actividad diferente o muestra un mensaje
+     * si la funcionalidad no está implementada aún.
+     */
     private fun setupClickListeners() {
         binding.btnMatchmaking.setOnClickListener {
             // To-do: Navegación a pantalla de emparejamiento

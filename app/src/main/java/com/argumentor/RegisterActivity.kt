@@ -8,12 +8,28 @@ import androidx.databinding.DataBindingUtil
 import com.argumentor.databinding.ActivityRegisterBinding
 import timber.log.Timber
 
+/**
+ * Actividad que maneja el registro de nuevos usuarios.
+ * 
+ * Permite a los usuarios crear una nueva cuenta proporcionando:
+ * - Nombre completo
+ * - Email
+ * - Nombre de usuario
+ * - Contraseña
+ */
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
-
+    private lateinit var observer: MyObserver
+    /**
+     * Método llamado al crear la actividad. Inicializa el Data Binding y configura los listeners.
+     * 
+     * @param savedInstanceState Estado previo de la actividad si está siendo recreada.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        observer = MyObserver(this.lifecycle, "RegisterActivity")
 
         // Inicializar Data Binding
         binding = DataBindingUtil.setContentView(this, R.layout.activity_register)
@@ -72,5 +88,4 @@ class RegisterActivity : AppCompatActivity() {
         super.onDestroy()
         Timber.i("onDestroy called")
     }
-
 }
