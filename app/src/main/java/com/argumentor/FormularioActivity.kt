@@ -8,83 +8,62 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
+import com.argumentor.databinding.ActivityFormularioBinding
+import com.argumentor.viewmodels.FormularioViewModel
 import timber.log.Timber
 
 class FormularioActivity : AppCompatActivity() {
 
-    private lateinit var recyclerTemas: RecyclerView
-    private lateinit var btnContinuar: MaterialButton
-    private lateinit var loadingOverlay: View
+    private lateinit var binding: ActivityFormularioBinding
+    private lateinit var observer: MyObserver
 
     // ViewModel para mantener los datos al girar la pantalla
-    private val formularioViewModel: FormularioViewModel by viewModels()
+    private val viewModel: FormularioViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_formulario)
+        
+        // Inicializar el observador del ciclo de vida
+        observer = MyObserver(this.lifecycle, "FormularioActivity")
+        
+        // Inicializar el data binding
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_formulario)
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
 
         // Configurar la toolbar
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
-        // Inicializar vistas
-        recyclerTemas = findViewById(R.id.recyclerTemas)
-        btnContinuar = findViewById(R.id.btnContinuar)
-        loadingOverlay = findViewById(R.id.loadingOverlay)
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         // Animación para la RecyclerView
         val animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_in)
-        recyclerTemas.startAnimation(animation)
+        binding.recyclerTemas.startAnimation(animation)
 
         // Configurar RecyclerView cuando cambian los datos del ViewModel
-        formularioViewModel.jugador.observe(this) { jugador ->
-            recyclerTemas.layoutManager = LinearLayoutManager(this)
-            recyclerTemas.adapter = TemaAdapter(jugador.listaTemas) { nombreTema, opinion ->
-                formularioViewModel.asignarPostura(nombreTema, opinion)
+        viewModel.jugador.observe(this) { jugador ->
+            binding.recyclerTemas.layoutManager = LinearLayoutManager(this)
+            binding.recyclerTemas.adapter = TemaAdapter(jugador.listaTemas) { nombreTema, opinion ->
+                viewModel.asignarPostura(nombreTema, opinion)
             }
-
         }
 
         // Configurar evento de clic para el botón continuar
-        btnContinuar.setOnClickListener {
-            loadingOverlay.visibility = View.VISIBLE
+        binding.btnContinuar.setOnClickListener {
+            // Mostrar el overlay de carga manualmente
+            binding.loadingOverlay.visibility = View.VISIBLE
 
             Handler(Looper.getMainLooper()).postDelayed({
-                loadingOverlay.visibility = View.GONE
+                // Ocultar el overlay de carga
+                binding.loadingOverlay.visibility = View.GONE
 
                 // Navegar a la siguiente actividad
-                val intent = Intent(this, LoginActivity::class.java)
+                val intent = Intent(this, HomeActivity::class.java)
                 startActivity(intent)
+                Timber.i("Navegando desde FormularioActivity a HomeActivity")
             }, 1500)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Timber.i("onStart called")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Timber.i("onResume called")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Timber.i("onPause called")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Timber.i("onStop called")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Timber.i("onDestroy called")
     }
 }

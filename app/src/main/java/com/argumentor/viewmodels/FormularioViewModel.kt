@@ -1,12 +1,12 @@
-package com.argumentor
+package com.argumentor.viewmodels
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.argumentor.R
 import com.argumentor.models.Jugador
 import com.argumentor.models.Tema
-import android.app.Application
-
-import androidx.lifecycle.AndroidViewModel
 
 class FormularioViewModel(application: Application) : AndroidViewModel(application) {
 

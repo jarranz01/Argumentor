@@ -9,12 +9,11 @@ import com.argumentor.databinding.ActivityLoginBinding
 import timber.log.Timber
 
 class LoginActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityLoginBinding
     private lateinit var observer: MyObserver
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        observer = MyObserver(this.lifecycle)
+        observer = MyObserver(this.lifecycle, "LoginActivity")
         // Vincular Data Binding con la vista
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
 
