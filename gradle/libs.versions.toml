@@ -35,6 +35,7 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 material-v1120 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 timber = {module = "com.jakewharton.timber:timber", version = "5.0.1"}
+lifeCycle = {module = "androidx.lifecycle:lifecycle-runtime-ktx", version = "2.6.2"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

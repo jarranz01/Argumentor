@@ -11,10 +11,10 @@ import timber.log.Timber
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-
+    private lateinit var observer: MyObserver
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        observer = MyObserver(this.lifecycle)
         // Vincular Data Binding con la vista
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
 
@@ -45,30 +45,6 @@ class LoginActivity : AppCompatActivity() {
                 Timber.i("Login successful, navigating to form")
             }
         }
-    }
-    override fun onStart() {
-        super.onStart()
-        Timber.i("onStart called")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Timber.i("onResume called")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Timber.i("onPause called")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Timber.i("onStop called")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Timber.i("onDestroy called")
     }
 
 }
