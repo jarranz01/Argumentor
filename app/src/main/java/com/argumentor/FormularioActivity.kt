@@ -43,7 +43,11 @@ class FormularioActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Inicializar el observador del ciclo de vida
-        observer = MyObserver(this.lifecycle, "FormularioActivity")
+        observer = MyObserver(
+            lifecycle,
+            "FormularioActivity",
+            this
+        )
 
         // Inicializar el Data Binding y vincular el layout a la Activity
         binding = DataBindingUtil.setContentView(this, R.layout.activity_formulario)

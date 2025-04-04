@@ -29,7 +29,13 @@ class HomeActivity : AppCompatActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {        
         super.onCreate(savedInstanceState)
-        observer = MyObserver(this.lifecycle, "LoginActivity")
+        
+        observer = MyObserver(
+            lifecycle,
+            "HomeActivity",
+            this
+        )
+        
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
 
         setupClickListeners()

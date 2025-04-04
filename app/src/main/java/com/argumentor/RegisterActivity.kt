@@ -29,7 +29,11 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        observer = MyObserver(this.lifecycle, "RegisterActivity")
+        observer = MyObserver(
+            lifecycle,
+            "RegisterActivity",
+            this
+        )
 
         // Inicializar Data Binding
         binding = DataBindingUtil.setContentView(this, R.layout.activity_register)

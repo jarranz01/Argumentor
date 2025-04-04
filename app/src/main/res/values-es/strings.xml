@@ -21,6 +21,7 @@
     <string name="register_button">Registrarse</string>
     <string name="empty_fields_error">Por favor, complete todos los campos</string>
     <string name="registration_successful">Registro exitoso</string>
+    <string name="session_expired_message">Tu sesión ha caducado por inactividad</string>
 
     <!-- Formulario -->
     <string name="form_title">Tus opiniones</string>

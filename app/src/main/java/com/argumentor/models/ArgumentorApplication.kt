@@ -2,7 +2,7 @@ package com.argumentor.models
 
 import android.app.Application
 import timber.log.Timber
-
+import com.argumentor.SessionManager
 /**
  * Clase base de la aplicación que inicializa componentes globales.
  * 
