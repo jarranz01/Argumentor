@@ -10,9 +10,9 @@
 
 - [x] Uso de data_bindings -> Unidad 6
 - [x] Logger (Uso de Timber) -> Unidad 7
-- [ ] Implementación del comportamiento del botón "atrás" -> Unidad 8
-- [ ] Persistencia (uso de onSaveInstanceState o ViewModel) -> Unidad 9 o 11
-- [ ] Implementación del Lifecycle -> Unidad 10
+- [x] Implementación del comportamiento del botón "atrás" -> Unidad 8
+- [x] Persistencia (uso de onSaveInstanceState o ViewModel) -> Unidad 9 o 11
+- [x] Implementación del Lifecycle -> Unidad 10
 
-- [ ] Implementación del LiveData -> Unidad 13
-- [ ] Implementación del paso de una vista a otra (intenciones) -> Unidad 15
+- [x] Implementación del LiveData -> Unidad 13
+- [x] Implementación del paso de una vista a otra (intenciones) -> Unidad 15
