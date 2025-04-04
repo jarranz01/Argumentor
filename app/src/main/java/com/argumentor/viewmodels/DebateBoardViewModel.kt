@@ -6,16 +6,35 @@ import androidx.lifecycle.ViewModel
 import com.argumentor.models.Debate
 import java.util.*
 
+/**
+ * ViewModel que administra la lista de debates.
+ *
+ * Proporciona funcionalidades para agregar debates y carga algunos debates de ejemplo al inicializarse.
+ */
 class DebateBoardViewModel : ViewModel() {
 
+    /**
+     * Lista de debates encapsulada. Se expone como LiveData para observar los cambios.
+     */
     private val _debates = MutableLiveData<List<Debate>>(emptyList())
+    
+    /**
+     * Lista de debates observable.
+     */
     val debates: LiveData<List<Debate>> = _debates
 
     init {
-        // Cargamos algunos debates de ejemplo
+        // Cargamos algunos debates de ejemplo para que no esté vacía de inicio
         addSampleDebates()
     }
 
+    /**
+     * Agrega un nuevo debate a la lista.
+     *
+     * @param title Título del debate.
+     * @param description Descripción del debate.
+     * @param author Autor que crea el debate.
+     */
     fun addDebate(title: String, description: String, author: String) {
         val newDebate = Debate(
             id = UUID.randomUUID().toString(),
@@ -27,6 +46,13 @@ class DebateBoardViewModel : ViewModel() {
         _debates.value = _debates.value?.plus(newDebate) ?: listOf(newDebate)
     }
 
+    /**
+     * Agrega debates de ejemplo a la lista.
+     *
+     * Este método se utiliza para inicializar la lista de debates con datos de muestra.
+     * 
+     * No usamos el fichero strings ya que vamos a quitarlos en un futuro (es algo estético por ahora)
+     */
     private fun addSampleDebates() {
         val sampleDebates = listOf(
             Debate(

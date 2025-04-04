@@ -8,16 +8,30 @@ import com.argumentor.R
 import com.argumentor.models.Jugador
 import com.argumentor.models.Tema
 
+/**
+ * ViewModel para administrar la información del formulario.
+ *
+ * Este ViewModel mantiene la información de un Jugador y la lista de Temas
+ * asociadas al mismo. Además, permite asignar una postura para cada tema.
+ *
+ * @param application Contexto de la aplicación utilizado para acceder a los recursos.
+ */
 class FormularioViewModel(application: Application) : AndroidViewModel(application) {
 
     private val context = getApplication<Application>().applicationContext
 
-    // LiveData para el jugador
+    /**
+     * LiveData encapsulado que contiene la información del jugador.
+     */
     private val _jugador = MutableLiveData<Jugador>()
+
+    /**
+     * Jugador observable correspondiente a la información del formulario.
+     */
     val jugador: LiveData<Jugador> get() = _jugador
 
     init {
-        // Inicializar el jugador con temas
+        // Inicializar el jugador con una lista de temas predefinidos.
         _jugador.value = Jugador(
             id = "1",
             nombre = context.getString(R.string.player_default_name),
@@ -37,7 +51,12 @@ class FormularioViewModel(application: Application) : AndroidViewModel(applicati
         )
     }
 
-    // Método para asignar una postura a un tema
+    /**
+     * Asigna una postura a un tema específico.
+     *
+     * @param tema El nombre del tema al que se le asignará la postura.
+     * @param opinion La opinión seleccionada para el tema.
+     */
     fun asignarPostura(tema: String, opinion: String) {
         _jugador.value?.asignarPostura(tema, opinion)
     }
