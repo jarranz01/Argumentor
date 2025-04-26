@@ -69,4 +69,25 @@
     <string name="current_user">You</string>
     <string name="joined_debate">You joined the debate: %1$s</string>
 
+    <!-- Debate View -->
+    <string name="debate_view_title">Vista del Debate</string>
+    <string name="stage_introduction">Introducción</string>
+    <string name="stage_refutation1">Primera Refutación</string>
+    <string name="stage_refutation2">Segunda Refutación</string>
+    <string name="stage_conclusion">Conclusión</string>
+    <string name="position_favor">A favor</string>
+    <string name="position_against">En contra</string>
+    <string name="opponents_argument">Argumento del oponente:</string>
+    <string name="your_response">Tu respuesta:</string>
+    <string name="submit_argument">Enviar Argumento</string>
+    <string name="debate_instructions">Instrucciones:</string>
+    <string name="introduction_instructions">Presenta tu postura inicial sobre el tema.</string>
+    <string name="refutation1_instructions">Refuta la introducción de tu oponente.</string>
+    <string name="refutation2_instructions">Refuta la primera refutación de tu oponente.</string>
+    <string name="conclusion_instructions">Presenta tu conclusión final basada en los argumentos anteriores.</string>
+    <string name="char_limit">Límite: %1$d/%2$d caracteres</string>
+    <string name="debate_stage_complete">Etapa completada</string>
+    <string name="waiting_for_opponent">Esperando respuesta del oponente...</string>
+    <string name="debate_complete">¡Debate completado!</string>
+
 </resources>

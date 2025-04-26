@@ -31,14 +31,6 @@ class MyObserver(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         Timber.d("$componentName - onResume called")
-
-        if (!SessionManager.checkSession()) {
-            Timber.d("Session invalid - redirecting to login")
-            activity?.let {
-                SessionManager.validateSession() // Resetear el estado
-                SessionManager.redirectToLogin(it)
-            }
-        }
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
@@ -50,9 +42,6 @@ class MyObserver(
     override fun onPause(owner: LifecycleOwner) {
         super.onPause(owner)
         Timber.d("$componentName - OnPause called")
-        
-        if (activity != null && !activity.isFinishing && !activity.isChangingConfigurations) {
-            SessionManager.invalidateSession()
-        }
+
     }
 }

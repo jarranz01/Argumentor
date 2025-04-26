@@ -1,5 +1,6 @@
 package com.argumentor
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -62,13 +63,20 @@ class DebateBoardActivity : AppCompatActivity() {
      * Configura el RecyclerView que muestra la lista de debates.
      *
      * Inicializa el adapter y establece el LinearLayoutManager junto con el adapter.
-     * Al hacer clic en el botón de "unirse" a un debate se muestra un Toast.
+     * Al hacer clic en el botón de "unirse" a un debate se muestra un Toast y se navega
+     * a la vista detallada del debate.
      */
     private fun setupRecyclerView() {
         adapter = DebateAdapter { debate ->
-            // Acción para unirse al debate (por implementar)
+            // Mostrar confirmación de unirse al debate
             Toast.makeText(this, getString(R.string.joined_debate, debate.title), Toast.LENGTH_SHORT).show()
             Timber.i("Joined debate: ${debate.title}")
+            
+            // Navegar a la vista de debate
+            val intent = Intent(this, DebateViewActivity::class.java).apply {
+                putExtra("debate_id", debate.id)
+            }
+            startActivity(intent)
         }
 
         binding.recyclerDebates.layoutManager = LinearLayoutManager(this)

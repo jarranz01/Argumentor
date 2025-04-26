@@ -33,6 +33,10 @@
         <activity
             android:name=".DebateBoardActivity"
             android:exported="false"/>
+        <!-- Nueva actividad para la vista del debate -->
+        <activity
+            android:name=".DebateViewActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

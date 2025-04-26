@@ -25,12 +25,7 @@ class LoginActivity : AppCompatActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        observer = MyObserver(
-            lifecycle,
-            "LoginActivity",
-            this
-        )
+        observer = MyObserver(this.lifecycle, "LoginActivity")
         // Vincular Data Binding con la vista
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
 
@@ -58,7 +53,6 @@ class LoginActivity : AppCompatActivity() {
                 val intent = Intent(this, HomeActivity::class.java)
                 startActivity(intent)
                 finish() // Evita volver atrás al login
-                SessionManager.validateSession()
                 Timber.i("Login successful, navigating to form")
             }
         }
