@@ -5,6 +5,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
+import android.os.Build
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -55,7 +56,15 @@ class DebateStageFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            debateStage = it.getSerializable(ARG_STAGE) as DebateStage
+            if (it.containsKey(ARG_STAGE)) {
+                // Use newer API on Android Tiramisu (API 33) and above, fallback to deprecated method on older versions
+                debateStage = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    it.getSerializable(ARG_STAGE, DebateStage::class.java) ?: DebateStage.INTRODUCCION
+                } else {
+                    @Suppress("DEPRECATION")
+                    it.getSerializable(ARG_STAGE) as? DebateStage ?: DebateStage.INTRODUCCION
+                }
+            }
         }
     }
     

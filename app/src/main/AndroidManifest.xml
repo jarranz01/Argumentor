@@ -2,37 +2,51 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.argumentor">
 
+    <!-- Añadir permiso de internet para Firebase -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:name=".models.ArgumentorApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Argumentor"
         android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
-        <activity
-            android:name=".HomeActivity"
-            android:exported="false" />
-        <!-- Register activity -->
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false"></activity> <!-- Login activity -->
+        
+        <!-- Asegurarnos de que el metadata de Firebase esté incluido -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
+            
+        <!-- Login activity -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Formulario activity -->
+        </activity>
+        
+        <!-- Register activity -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+            
+        <!-- Formulario activity -->
         <activity
             android:name=".FormularioActivity"
-            android:exported="false"></activity>
+            android:exported="false" />
+            
+        <!-- Home activity (eliminada la duplicada) -->
         <activity
             android:name=".HomeActivity"
-            android:exported="false"/>
+            android:exported="false" />
+            
         <activity
             android:name=".DebateBoardActivity"
-            android:exported="false"/>
+            android:exported="false" />
+            
         <!-- Nueva actividad para la vista del debate -->
         <activity
             android:name=".DebateViewActivity"

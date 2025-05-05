@@ -12,6 +12,7 @@ package com.argumentor.models
  * @property participantContra ID del usuario que defiende la postura en contra
  * @property status Estado del debate (pendiente, activo, terminado)
  * @property timestamp Fecha de creación en milisegundos (por defecto: tiempo actual)
+ * @property category Categoría temática del debate (opcional)
  */
 data class Debate(
     val id: String = "",
@@ -21,15 +22,16 @@ data class Debate(
     val currentStage: DebateStage = DebateStage.INTRODUCCION,
     val participantFavor: String = "",
     val participantContra: String = "",
-    val status: DebateStatus = DebateStatus.PENDIENTE,
-    val timestamp: Long = System.currentTimeMillis()
-)
-
-/**
- * Enumera los posibles estados de un debate.
- */
-enum class DebateStatus {
-    PENDIENTE,   // Esperando participantes
-    ACTIVO,      // En curso
-    TERMINADO    // Finalizado
+    val status: Status = Status.PENDIENTE,
+    val timestamp: Long = System.currentTimeMillis(),
+    val category: String? = null
+) {
+    /**
+     * Enumera los posibles estados de un debate.
+     */
+    enum class Status {
+        PENDIENTE,   // Esperando participantes
+        ACTIVO,      // En curso
+        TERMINADO    // Finalizado
+    }
 }

@@ -22,6 +22,16 @@
     <string name="register_button">Register</string>
     <string name="empty_fields_error">Please complete all fields</string>
     <string name="registration_successful">Registration successful</string>
+    <string name="login_successful">Login successful</string>
+    <string name="login_failed">Login failed: %1$s</string>
+    <string name="registration_failed">Registration failed: %1$s</string>
+    <string name="firebase_error_invalid_email">Invalid email address</string>
+    <string name="firebase_error_user_not_found">User not found</string>
+    <string name="firebase_error_wrong_password">Incorrect password</string>
+    <string name="firebase_error_email_already_in_use">Email already in use</string>
+    <string name="firebase_error_weak_password">Password is too weak</string>
+    <string name="firebase_error_network">Network error. Check your connection</string>
+    <string name="firebase_error_generic">Authentication error. Try again later</string>
     <string name="session_expired_message">Tu sesión ha caducado por inactividad</string>
 
     <!-- Formulario -->
@@ -70,24 +80,24 @@
     <string name="joined_debate">You joined the debate: %1$s</string>
 
     <!-- Debate View -->
-    <string name="debate_view_title">Vista del Debate</string>
-    <string name="stage_introduction">Introducción</string>
-    <string name="stage_refutation1">Primera Refutación</string>
-    <string name="stage_refutation2">Segunda Refutación</string>
-    <string name="stage_conclusion">Conclusión</string>
-    <string name="position_favor">A favor</string>
-    <string name="position_against">En contra</string>
-    <string name="opponents_argument">Argumento del oponente:</string>
-    <string name="your_response">Tu respuesta:</string>
-    <string name="submit_argument">Enviar Argumento</string>
-    <string name="debate_instructions">Instrucciones:</string>
-    <string name="introduction_instructions">Presenta tu postura inicial sobre el tema.</string>
-    <string name="refutation1_instructions">Refuta la introducción de tu oponente.</string>
-    <string name="refutation2_instructions">Refuta la primera refutación de tu oponente.</string>
-    <string name="conclusion_instructions">Presenta tu conclusión final basada en los argumentos anteriores.</string>
-    <string name="char_limit">Límite: %1$d/%2$d caracteres</string>
-    <string name="debate_stage_complete">Etapa completada</string>
-    <string name="waiting_for_opponent">Esperando respuesta del oponente...</string>
-    <string name="debate_complete">¡Debate completado!</string>
+    <string name="debate_view_title">Debate View</string>
+    <string name="stage_introduction">Introduction</string>
+    <string name="stage_refutation1">First Refutation</string>
+    <string name="stage_refutation2">Second Refutation</string>
+    <string name="stage_conclusion">Conclusion</string>
+    <string name="position_favor">In Favor</string>
+    <string name="position_against">Against</string>
+    <string name="opponents_argument">Opponent\'s Argument:</string>
+    <string name="your_response">Your Response:</string>
+    <string name="submit_argument">Submit Argument</string>
+    <string name="debate_instructions">Instructions:</string>
+    <string name="introduction_instructions">Present your initial stance on the topic.</string>
+    <string name="refutation1_instructions">Refute your opponent\'s introduction.</string>
+    <string name="refutation2_instructions">Refute your opponent\'s first refutation.</string>
+    <string name="conclusion_instructions">Present your final conclusion based on the previous arguments.</string>
+    <string name="char_limit">Limit: %1$d/%2$d characters</string>
+    <string name="debate_stage_complete">Stage Completed</string>
+    <string name="waiting_for_opponent">Waiting for opponent\'s response…</string>
+    <string name="debate_complete">Debate Completed!</string>
 
 </resources>
