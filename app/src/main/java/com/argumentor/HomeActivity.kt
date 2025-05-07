@@ -1,6 +1,8 @@
 package com.argumentor
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +13,7 @@ import timber.log.Timber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 /**
  * Actividad principal que sirve como hub de navegación para las diferentes funcionalidades de la app.
@@ -35,6 +38,9 @@ class HomeActivity : AppCompatActivity() {
      * @param savedInstanceState Estado previo de la actividad si está siendo recreada.
      */
     override fun onCreate(savedInstanceState: Bundle?) {        
+        // Asegurarnos de que estamos usando la configuración de idioma correcta
+        applyStoredLanguageConfiguration()
+        
         super.onCreate(savedInstanceState)
         
         // Inicializar el observador de ciclo de vida
@@ -60,6 +66,26 @@ class HomeActivity : AppCompatActivity() {
         setupUI()
     }
     
+    /**
+     * Aplica la configuración de idioma guardada en las preferencias.
+     */
+    private fun applyStoredLanguageConfiguration() {
+        val preferences = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+        val languageCode = preferences.getString("language", Locale.getDefault().language) 
+            ?: Locale.getDefault().language
+        
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        
+        val config = Configuration(resources.configuration)
+        config.setLocale(locale)
+        
+        // Crear un nuevo contexto con la configuración actualizada (método recomendado)
+        createConfigurationContext(config)
+        
+        Timber.d("Configuración de idioma aplicada en HomeActivity: $languageCode")
+    }
+
     /**
      * Configura el mensaje de bienvenida personalizado con el nombre del usuario.
      */

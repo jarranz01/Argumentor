@@ -1,5 +1,6 @@
 package com.argumentor.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -76,12 +77,25 @@ class DebateStageFragment : Fragment() {
         }
     }
     
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        // Asegurarnos de que estamos usando el contexto con el idioma correcto
+        Timber.d("DebateStageFragment.onAttach() - Fragmento adjuntado al contexto")
+    }
+    
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentDebateStageBinding.inflate(inflater, container, false)
+        // Obtener el contexto con la configuración regional correcta
+        val contextWithCorrectLocale = requireContext()
+        
+        // Usar un inflater basado en ese contexto
+        val localizedInflater = inflater.cloneInContext(contextWithCorrectLocale)
+        
+        // Usar _binding (la variable mutable) en lugar de binding (la propiedad de solo lectura)
+        _binding = FragmentDebateStageBinding.inflate(localizedInflater, container, false)
         
         binding.viewModel = viewModel
         binding.stage = debateStage
@@ -128,7 +142,14 @@ class DebateStageFragment : Fragment() {
             
             // Establecer instrucciones
             try {
-                binding.textInstructions.text = viewModel.getInstructionForStage(debateStage)
+                // Establecer instrucciones usando directamente los recursos del fragmento
+                val instructionText = when (debateStage) {
+                    DebateStage.INTRODUCCION -> getString(R.string.instruction_introduction)
+                    DebateStage.REFUTACION1 -> getString(R.string.instruction_refutation1)
+                    DebateStage.REFUTACION2 -> getString(R.string.instruction_refutation2)
+                    DebateStage.CONCLUSION -> getString(R.string.instruction_conclusion)
+                }
+                binding.textInstructions.text = instructionText
             } catch (e: Exception) {
                 Timber.e(e, "Error al obtener instrucciones para la etapa")
                 binding.textInstructions.text = ""

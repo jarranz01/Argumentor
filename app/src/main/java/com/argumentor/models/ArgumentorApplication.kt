@@ -213,11 +213,10 @@ class ArgumentorApplication : Application() {
         val config = Configuration(resources.configuration)
         config.setLocale(locale)
         
-        // Actualizar la configuración de recursos
-        resources.updateConfiguration(config, resources.displayMetrics)
-        
-        // Crear un nuevo contexto con la configuración actualizada
+        // Crear un nuevo contexto con la configuración actualizada (método recomendado)
         createConfigurationContext(config)
+        
+        // No usar resources.updateConfiguration() porque está deprecado
 
         Timber.d("Idioma aplicado al iniciar la app: $languageCode")
     }
@@ -238,6 +237,8 @@ class ArgumentorApplication : Application() {
 
         // Crear un nuevo contexto con la configuración actualizada
         val updatedContext = base.createConfigurationContext(config)
+        
+        // No usar base.resources.updateConfiguration() porque está deprecado
 
         super.attachBaseContext(updatedContext)
     }

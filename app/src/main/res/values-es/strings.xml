@@ -119,10 +119,6 @@
     <string name="your_response">Tu respuesta:</string>
     <string name="submit_argument">Enviar Argumento</string>
     <string name="debate_instructions">Instrucciones:</string>
-    <string name="introduction_instructions">Presenta tu postura inicial sobre el tema.</string>
-    <string name="refutation1_instructions">Refuta la introducción de tu oponente.</string>
-    <string name="refutation2_instructions">Refuta la primera refutación de tu oponente.</string>
-    <string name="conclusion_instructions">Presenta tu conclusión final basada en los argumentos anteriores.</string>
     <string name="char_limit">Límite: %1$d/%2$d caracteres</string>
     <string name="debate_stage_complete">Etapa completada</string>
     <string name="waiting_for_opponent">Esperando respuesta del oponente…</string>
@@ -134,4 +130,15 @@
     <string name="logout">Cerrar sesión</string>
     <string name="language_changed">Idioma cambiado. Por favor, reinicie la aplicación para que los cambios surtan efecto.</string>
     <string name="logout_success">Has cerrado sesión</string>
+
+    <!-- Instrucciones para las fases del debate -->
+    <string name="instruction_introduction">Presenta tu postura inicial sobre el tema.</string>
+    <string name="instruction_refutation1">Refuta la introducción de tu oponente.</string>
+    <string name="instruction_refutation2">Refuta la primera refutación de tu oponente.</string>
+    <string name="instruction_conclusion">Presenta tu conclusión final basada en los argumentos anteriores.</string>
+    
+    <!-- Cadenas para el fragmento de historial -->
+    <string name="argument_history">Historial de argumentos</string>
+    <string name="view_history">Ver historial</string>
+    <string name="back_to_debate">Volver al debate</string>
 </resources>

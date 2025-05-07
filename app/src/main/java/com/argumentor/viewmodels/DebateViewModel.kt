@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
+import com.argumentor.R
 
 /**
  * ViewModel para gestionar la visualización e interacción con un debate.
@@ -332,11 +333,15 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
      * @return El texto de instrucción para esa etapa
      */
     fun getInstructionForStage(stage: DebateStage): String {
+        // Usar el contexto de la aplicación y asegurarse de obtener los recursos actualizados
+        val context = getApplication<Application>()
+        val resources = context.resources
+        
         return when (stage) {
-            DebateStage.INTRODUCCION -> "Presenta tu postura inicial sobre el tema."
-            DebateStage.REFUTACION1 -> "Refuta la introducción de tu oponente."
-            DebateStage.REFUTACION2 -> "Refuta la primera refutación de tu oponente."
-            DebateStage.CONCLUSION -> "Presenta tu conclusión final basada en los argumentos anteriores."
+            DebateStage.INTRODUCCION -> resources.getString(R.string.instruction_introduction)
+            DebateStage.REFUTACION1 -> resources.getString(R.string.instruction_refutation1)
+            DebateStage.REFUTACION2 -> resources.getString(R.string.instruction_refutation2)
+            DebateStage.CONCLUSION -> resources.getString(R.string.instruction_conclusion)
         }
     }
     

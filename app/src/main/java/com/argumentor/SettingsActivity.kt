@@ -141,14 +141,14 @@ class SettingsActivity : AppCompatActivity() {
         val locale = Locale(languageCode)
         Locale.setDefault(locale)
 
+        // Crear una nueva configuración con el idioma seleccionado
         val config = Configuration(resources.configuration)
         config.setLocale(locale)
         
-        // Actualizar la configuración de recursos
-        resources.updateConfiguration(config, resources.displayMetrics)
-        
-        // También crear un nuevo contexto con la configuración actualizada
+        // Crear un nuevo contexto con la configuración actualizada (método recomendado)
         createConfigurationContext(config)
+        
+        // No usar resources.updateConfiguration() porque está deprecado
         
         Timber.d("Idioma cambiado a $languageCode en SettingsActivity")
     }

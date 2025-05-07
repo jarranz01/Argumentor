@@ -1,23 +1,30 @@
 package com.argumentor
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.argumentor.database.RepositoryProvider
 import com.argumentor.databinding.ActivityDebateViewBinding
+import com.argumentor.fragments.ArgumentHistoryFragment
 import com.argumentor.fragments.DebateStageFragment
 import com.argumentor.models.DebateStage
 import com.argumentor.viewmodels.DebateViewModel
 import com.google.android.material.tabs.TabLayoutMediator
-import timber.log.Timber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.util.Locale
 
 /**
  * Actividad principal para la visualización y participación en un debate.
@@ -32,8 +39,13 @@ class DebateViewActivity : AppCompatActivity() {
     private lateinit var observer: MyObserver
     private lateinit var sessionManager: SessionManager
     private lateinit var repositoryProvider: RepositoryProvider
+    private var isInHistoryView = false
+    private var debateId: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Asegurarnos de que estamos usando la configuración de idioma correcta
+        applyStoredLanguageConfiguration()
+        
         super.onCreate(savedInstanceState)
         
         try {
@@ -50,8 +62,8 @@ class DebateViewActivity : AppCompatActivity() {
             sessionManager = SessionManager(this)
             
             // Obtener ID del debate desde los extras
-            val debateId = intent.getStringExtra("debate_id")
-            if (debateId.isNullOrEmpty()) {
+            debateId = intent.getStringExtra("debate_id") ?: ""
+            if (debateId.isEmpty()) {
                 Timber.e("ID de debate no proporcionado o vacío")
                 Toast.makeText(this, "Error: No se pudo cargar el debate", Toast.LENGTH_SHORT).show()
                 finish()
@@ -95,6 +107,83 @@ class DebateViewActivity : AppCompatActivity() {
             Toast.makeText(this, "Error al cargar el debate", Toast.LENGTH_SHORT).show()
             finish()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_debate_view, menu)
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        menu?.findItem(R.id.action_view_history)?.isVisible = !isInHistoryView
+        menu?.findItem(R.id.action_back_to_debate)?.isVisible = isInHistoryView
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_view_history -> {
+                // Navegar al fragmento de historial
+                navigateToHistoryFragment()
+                true
+            }
+            R.id.action_back_to_debate -> {
+                // Volver al fragmento de debate
+                navigateToDebateFragments()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    /**
+     * Navega al fragmento de historial de argumentos.
+     */
+    private fun navigateToHistoryFragment() {
+        // Ocultar ViewPager y TabLayout
+        binding.viewPager.visibility = android.view.View.GONE
+        binding.tabLayout.visibility = android.view.View.GONE
+        
+        val fragmentManager = supportFragmentManager
+        val transaction = fragmentManager.beginTransaction()
+        
+        // Añadir animación de transición
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+        
+        // Reemplazar el contenido con el fragmento de historial
+        transaction.replace(
+            R.id.fragmentContainer, 
+            ArgumentHistoryFragment.newInstance(debateId)
+        )
+        
+        transaction.commit()
+        
+        // Actualizar estado
+        isInHistoryView = true
+        invalidateOptionsMenu()
+    }
+
+    /**
+     * Vuelve a los fragmentos de debate (ViewPager con tabs).
+     */
+    private fun navigateToDebateFragments() {
+        // Mostrar ViewPager y TabLayout
+        binding.viewPager.visibility = android.view.View.VISIBLE
+        binding.tabLayout.visibility = android.view.View.VISIBLE
+        
+        val fragmentManager = supportFragmentManager
+        val transaction = fragmentManager.beginTransaction()
+        
+        // Remover el fragmento de historial
+        val historyFragment = fragmentManager.findFragmentById(R.id.fragmentContainer)
+        if (historyFragment != null) {
+            transaction.remove(historyFragment)
+            transaction.commit()
+        }
+        
+        // Actualizar estado
+        isInHistoryView = false
+        invalidateOptionsMenu()
     }
 
     /**
@@ -207,5 +296,25 @@ class DebateViewActivity : AppCompatActivity() {
                     }
                 }
         }
+    }
+
+    /**
+     * Aplica la configuración de idioma guardada en las preferencias.
+     */
+    private fun applyStoredLanguageConfiguration() {
+        val preferences = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+        val languageCode = preferences.getString("language", Locale.getDefault().language) 
+            ?: Locale.getDefault().language
+        
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        
+        val config = Configuration(resources.configuration)
+        config.setLocale(locale)
+        
+        // Crear un nuevo contexto con la configuración actualizada (método recomendado)
+        createConfigurationContext(config)
+        
+        Timber.d("Configuración de idioma aplicada en DebateViewActivity: $languageCode")
     }
 }
