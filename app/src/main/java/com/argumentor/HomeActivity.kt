@@ -71,8 +71,9 @@ class HomeActivity : AppCompatActivity() {
         }
 
         binding.btnSettings.setOnClickListener {
-            // To-do: Navegación a pantalla de ajustes
-            Timber.i("Settings clicked - Not implemented yet")
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+            Timber.i("Navigate to settings")
         }
     }
 }

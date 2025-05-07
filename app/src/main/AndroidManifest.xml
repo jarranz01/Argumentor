@@ -11,7 +11,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Argumentor"
-        android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
+        android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true">
         
         <!-- Asegurarnos de que el metadata de Firebase esté incluido -->
         <meta-data
@@ -50,6 +54,10 @@
         <!-- Nueva actividad para la vista del debate -->
         <activity
             android:name=".DebateViewActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SettingsActivity"
             android:exported="false" />
     </application>
 

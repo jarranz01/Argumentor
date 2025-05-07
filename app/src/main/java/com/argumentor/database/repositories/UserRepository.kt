@@ -11,10 +11,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.security.MessageDigest
+import java.util.UUID
 
 /**
  * Repositorio que proporciona una API limpia para acceder a los datos de usuarios.
@@ -279,66 +278,5 @@ class UserRepository(
      */
     fun getCurrentFirebaseUser(): FirebaseUser? {
         return firebaseAuth.currentUser
-    }
-    
-    /**
-     * Este método se mantiene para compatibilidad con código existente
-     * En una versión futura, debería eliminarse ya que la autenticación se maneja con Firebase
-     */
-    @Deprecated("Usar loginWithFirebase en su lugar")
-    suspend fun login(username: String, password: String): UserEntity? {
-        val user = userDao.getUserByUsername(username) ?: return null
-        
-        return if (user.password == hashPassword(password)) {
-            user
-        } else {
-            null
-        }
-    }
-    
-    /**
-     * Este método se mantiene para compatibilidad con código existente
-     * En una versión futura, debería eliminarse ya que el registro se maneja con Firebase
-     */
-    @Deprecated("Usar registerUserWithFirebase en su lugar")
-    suspend fun registerUser(username: String, password: String, email: String? = null): UserEntity? {
-        // Comprobar si el usuario ya existe
-        if (userDao.getUserByUsername(username) != null) {
-            return null
-        }
-        
-        // Hash de la contraseña
-        val passwordHash = hashPassword(password)
-        
-        // Crear un nuevo usuario
-        val user = UserEntity(
-            userId = generateUserId(username),
-            name = username,
-            email = email,
-            password = passwordHash
-        )
-        
-        userDao.insertUser(user)
-        return user
-    }
-    
-    /**
-     * Genera un hash seguro de la contraseña.
-     * En una aplicación real, deberías usar un algoritmo más robusto como bcrypt.
-     */
-    @Deprecated("Ya no es necesario con Firebase Auth")
-    private fun hashPassword(password: String): String {
-        val bytes = password.toByteArray()
-        val md = MessageDigest.getInstance("SHA-256")
-        val digest = md.digest(bytes)
-        return digest.fold("") { str, it -> str + "%02x".format(it) }
-    }
-    
-    /**
-     * Genera un ID único para un usuario.
-     */
-    @Deprecated("Ya no es necesario con Firebase Auth")
-    private fun generateUserId(username: String): String {
-        return "user_${System.currentTimeMillis()}_${username.hashCode()}"
     }
 }

@@ -100,4 +100,11 @@
     <string name="waiting_for_opponent">Waiting for opponent\'s response…</string>
     <string name="debate_complete">Debate Completed!</string>
 
+    <string name="language_selection">Language Selection</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Spanish</string>
+    <string name="logout">Log Out</string>
+    <string name="language_changed">Language changed. Please restart the app for changes to take effect.</string>
+    <string name="logout_success">You have been logged out</string>
+
 </resources>

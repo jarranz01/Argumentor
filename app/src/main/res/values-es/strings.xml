@@ -88,4 +88,11 @@
     <string name="debate_stage_complete">Etapa completada</string>
     <string name="waiting_for_opponent">Esperando respuesta del oponente…</string>
     <string name="debate_complete">¡Debate completado!</string>
+
+    <string name="language_selection">Selección de idioma</string>
+    <string name="language_english">Inglés</string>
+    <string name="language_spanish">Español</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="language_changed">Idioma cambiado. Por favor, reinicie la aplicación para que los cambios surtan efecto.</string>
+    <string name="logout_success">Has cerrado sesión</string>
 </resources>
