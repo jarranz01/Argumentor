@@ -33,10 +33,21 @@ import androidx.room.PrimaryKey
 data class ArgumentEntity(
     @PrimaryKey(autoGenerate = true)
     val argumentId: Long = 0,
-    val debateId: String,
-    val userId: String,
-    val stage: String,  // INTRODUCCION, REFUTACION1, REFUTACION2, CONCLUSION
-    val position: String, // A_FAVOR, EN_CONTRA
-    val content: String,
+    val debateId: String = "",
+    val userId: String = "",
+    val stage: String = "",  // INTRODUCCION, REFUTACION1, REFUTACION2, CONCLUSION
+    val position: String = "", // A_FAVOR, EN_CONTRA
+    val content: String = "",
     val timestamp: Long = System.currentTimeMillis()
-)
+) {
+    // Constructor sin argumentos requerido para Firebase Firestore
+    constructor() : this(
+        argumentId = 0,
+        debateId = "",
+        userId = "",
+        stage = "",
+        position = "",
+        content = "",
+        timestamp = System.currentTimeMillis()
+    )
+}

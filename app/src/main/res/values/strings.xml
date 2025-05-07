@@ -107,6 +107,8 @@
     <string name="show_opponent_response">Show opponent response</string>
     <string name="hide_opponent_response">Hide opponent response</string>
     <string name="must_wait_for_opponent">You must wait for your opponent to respond</string>
+    <string name="argument_saved_message">Argument saved successfully</string>
+    <string name="error_saving_argument">Error saving your argument. Please try again.</string>
 
     <!-- Debate View -->
     <string name="debate_view_title">Debate View</string>

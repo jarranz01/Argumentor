@@ -104,6 +104,8 @@
     <string name="show_opponent_response">Mostrar respuesta del oponente</string>
     <string name="hide_opponent_response">Ocultar respuesta del oponente</string>
     <string name="must_wait_for_opponent">Debes esperar a que tu oponente responda</string>
+    <string name="argument_saved_message">Argumento guardado correctamente</string>
+    <string name="error_saving_argument">Error al guardar tu argumento. Por favor, inténtalo de nuevo.</string>
 
     <!-- Debate View -->
     <string name="debate_view_title">Vista del Debate</string>

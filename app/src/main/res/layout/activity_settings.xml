@@ -52,13 +52,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:checkedButton="@id/radioEnglish">
 
                         <RadioButton
                             android:id="@+id/radioEnglish"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:padding="8dp"
+                            android:checked="true"
                             android:text="@string/language_english" />
 
                         <RadioButton
@@ -66,6 +68,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:padding="8dp"
+                            android:checked="false"
                             android:text="@string/language_spanish" />
                     </RadioGroup>
 

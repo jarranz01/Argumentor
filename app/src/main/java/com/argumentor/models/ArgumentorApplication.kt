@@ -81,6 +81,67 @@ class ArgumentorApplication : Application() {
     }
     
     /**
+     * Método llamado al crear la aplicación. Configura el sistema de logging
+     * e inicializa componentes necesarios.
+     */
+    override fun onCreate() {
+        super.onCreate()
+        instance = this
+        
+        // Inicializar Timber para logging
+        Timber.plant(Timber.DebugTree())
+        
+        Timber.d("ArgumentorApplication.onCreate() - Inicializando componentes")
+        
+        // Inicializar Firebase de manera segura
+        try {
+            applicationScope.launch(Dispatchers.IO) {
+                try {
+                    initializeFirebase()
+                
+                    // Inicializar explícitamente Auth y Firestore
+                    _firebaseAuth = FirebaseAuth.getInstance()
+                    _firestore = FirebaseFirestore.getInstance()
+                
+                    // Verificación adicional de inicialización
+                    if (_firebaseAuth != null && _firestore != null) {
+                        Timber.d("Firebase inicializado exitosamente en segundo plano")
+                        
+                        // Iniciar sincronización periódica con Firebase
+                        try {
+                            val firebaseService = com.argumentor.services.FirebaseService(applicationContext)
+                            firebaseService.startPeriodicSync()
+                            Timber.d("Sincronización periódica con Firebase iniciada")
+                        } catch (e: Exception) {
+                            Timber.e(e, "Error al iniciar sincronización periódica")
+                        }
+                    } else {
+                        Timber.e("Firebase inicializado pero las instancias son nulas")
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Error inicializando Firebase en segundo plano")
+                }
+            }
+            
+            // También inicializar en el hilo principal para asegurarnos
+            initializeFirebase()
+            
+            // Verificación adicional de inicialización correcta
+            val firebaseApp = FirebaseApp.getInstance()
+            Timber.d("Firebase App verificada: ${firebaseApp.name}")
+            
+        } catch (e: Exception) {
+            Timber.e(e, "Error crítico en la inicialización de Firebase")
+            showFirebaseError("Error crítico en inicialización: ${e.message}")
+        }
+        
+        // Aplicar el idioma guardado
+        applyLanguageFromSettings()
+        
+        Timber.d("ArgumentorApplication inicializada")
+    }
+    
+    /**
      * Inicializa Firebase de manera segura, con manejo de excepciones extensivo
      */
     private fun initializeFirebase() {
@@ -135,63 +196,14 @@ class ArgumentorApplication : Application() {
     }
     
     /**
-     * Método llamado al crear la aplicación. Configura el sistema de logging
-     * e inicializa componentes necesarios.
-     */
-    override fun onCreate() {
-        super.onCreate()
-        instance = this
-        
-        // Inicializar Timber para logging
-        Timber.plant(Timber.DebugTree())
-        
-        Timber.d("ArgumentorApplication.onCreate() - Inicializando componentes")
-        
-        // Inicializar Firebase de manera segura
-        try {
-            applicationScope.launch(Dispatchers.IO) {
-                try {
-                    initializeFirebase()
-                
-                    // Inicializar explícitamente Auth y Firestore
-                    _firebaseAuth = FirebaseAuth.getInstance()
-                    _firestore = FirebaseFirestore.getInstance()
-                
-                    // Verificación adicional de inicialización
-                    if (_firebaseAuth != null && _firestore != null) {
-                        Timber.d("Firebase inicializado exitosamente en segundo plano")
-                    } else {
-                        Timber.e("Firebase inicializado pero las instancias son nulas")
-                    }
-                } catch (e: Exception) {
-                    Timber.e(e, "Error inicializando Firebase en segundo plano")
-                }
-            }
-            
-            // También inicializar en el hilo principal para asegurarnos
-            initializeFirebase()
-            
-            // Verificación adicional de inicialización correcta
-            val firebaseApp = FirebaseApp.getInstance()
-            Timber.d("Firebase App verificada: ${firebaseApp.name}")
-            
-        } catch (e: Exception) {
-            Timber.e(e, "Error crítico en la inicialización de Firebase")
-            showFirebaseError("Error crítico en inicialización: ${e.message}")
-        }
-        
-        // Aplicar el idioma guardado
-        applyLanguageFromSettings()
-        
-        Timber.d("ArgumentorApplication inicializada")
-    }
-    
-    /**
      * Aplica el idioma guardado en las preferencias compartidas.
+     * Si no hay un idioma guardado, utiliza el idioma del sistema.
      */
     private fun applyLanguageFromSettings() {
         val preferences = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-        val languageCode = preferences.getString("language", Locale.getDefault().language) ?: "en"
+        val languageCode = preferences.getString("language", Locale.getDefault().language) ?: Locale.getDefault().language
+
+        Timber.d("Aplicando idioma al iniciar la app: $languageCode")
 
         // Aplicar la configuración regional
         val locale = Locale(languageCode)
@@ -201,19 +213,21 @@ class ArgumentorApplication : Application() {
         val config = Configuration(resources.configuration)
         config.setLocale(locale)
         
+        // Actualizar la configuración de recursos
+        resources.updateConfiguration(config, resources.displayMetrics)
+        
         // Crear un nuevo contexto con la configuración actualizada
         createConfigurationContext(config)
-        
-        // No es necesario llamar a updateConfiguration, que está obsoleto
-        // El sistema usará la configuración del contexto creado arriba
 
         Timber.d("Idioma aplicado al iniciar la app: $languageCode")
     }
 
     override fun attachBaseContext(base: Context) {
-        // Obtener el idioma guardado
+        // Obtener el idioma guardado o usar el del sistema como predeterminado
         val preferences = base.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-        val languageCode = preferences.getString("language", Locale.getDefault().language) ?: "en"
+        val languageCode = preferences.getString("language", Locale.getDefault().language) ?: Locale.getDefault().language
+
+        Timber.d("attachBaseContext: Aplicando idioma: $languageCode")
 
         // Crear una configuración con el idioma seleccionado
         val locale = Locale(languageCode)

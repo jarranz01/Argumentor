@@ -30,8 +30,16 @@ import androidx.room.Index
     ]
 )
 data class UserStanceEntity(
-    val userId: String,
-    val topicName: String,
-    val stance: String,  // Por ejemplo: "A_FAVOR", "EN_CONTRA", "NEUTRAL"
+    val userId: String = "",
+    val topicName: String = "",
+    val stance: String = "",  // Por ejemplo: "A_FAVOR", "EN_CONTRA", "NEUTRAL"
     val updatedAt: Long = System.currentTimeMillis()
-)
+) {
+    // Constructor sin argumentos requerido para Firebase Firestore
+    constructor() : this(
+        userId = "",
+        topicName = "",
+        stance = "",
+        updatedAt = System.currentTimeMillis()
+    )
+}

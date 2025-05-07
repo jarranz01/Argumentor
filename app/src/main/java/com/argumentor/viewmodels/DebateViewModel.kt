@@ -72,6 +72,12 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
     val errorMessage: LiveData<String?> = _errorMessage
 
     /**
+     * Obtiene el ID del debate actual
+     */
+    private val _currentDebateId = MutableLiveData<String>()
+    val currentDebateId: LiveData<String> = _currentDebateId
+
+    /**
      * Inicializa el ViewModel con los datos del debate.
      *
      * @param debateId ID del debate a cargar
@@ -80,6 +86,9 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
     fun initialize(debateId: String, userId: String) {
         this.debateId = debateId
         this.userId = userId
+        
+        // Actualizar el LiveData con el ID del debate
+        _currentDebateId.value = debateId
         
         // Cargar datos del debate desde la base de datos
         loadDebate()
@@ -458,6 +467,49 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
                 // No mostrar mensaje de error para no interrumpir la experiencia
             }
         }
+    }
+    
+    /**
+     * Guarda un argumento en la base de datos.
+     *
+     * @param debateId ID del debate
+     * @param userId ID del usuario
+     * @param stage Etapa del debate (como string)
+     * @param position Posición (A_FAVOR o EN_CONTRA, como string)
+     * @param content Contenido del argumento
+     * @return LiveData<Boolean> con el resultado de la operación
+     */
+    fun saveArgument(
+        debateId: String,
+        userId: String,
+        stage: String,
+        position: String,
+        content: String
+    ): LiveData<Boolean> {
+        val result = MutableLiveData<Boolean>()
+        
+        viewModelScope.launch {
+            try {
+                debateRepository.addArgument(
+                    debateId = debateId,
+                    userId = userId,
+                    stage = stage,
+                    position = position,
+                    content = content
+                )
+                
+                // Recargar las entradas del debate
+                loadDebateEntries()
+                
+                // Marcar como exitoso
+                result.value = true
+            } catch (e: Exception) {
+                Timber.e(e, "Error al guardar argumento: $e")
+                result.value = false
+            }
+        }
+        
+        return result
     }
     
     /**

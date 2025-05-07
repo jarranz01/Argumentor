@@ -24,13 +24,26 @@ import androidx.room.PrimaryKey
 )
 data class DebateEntity(
     @PrimaryKey
-    val debateId: String,
-    val title: String,
-    val description: String,
+    val debateId: String = "",
+    val title: String = "",
+    val description: String = "",
     val authorUserId: String? = null,
-    val participantFavorUserId: String,
-    val participantContraUserId: String,
-    val status: String,  // PENDIENTE, ACTIVO, TERMINADO
+    val participantFavorUserId: String = "",
+    val participantContraUserId: String = "",
+    val status: String = "PENDIENTE",  // PENDIENTE, ACTIVO, TERMINADO
     val timestamp: Long = System.currentTimeMillis(),
     val category: String? = null
-)
+) {
+    // Constructor sin argumentos requerido para Firebase Firestore
+    constructor() : this(
+        debateId = "",
+        title = "",
+        description = "",
+        authorUserId = null,
+        participantFavorUserId = "",
+        participantContraUserId = "",
+        status = "PENDIENTE",
+        timestamp = System.currentTimeMillis(),
+        category = null
+    )
+}

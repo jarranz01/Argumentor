@@ -13,8 +13,10 @@ import com.argumentor.database.entities.UserStanceEntity
 import com.argumentor.databinding.ActivityMatchmakingBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -157,6 +159,86 @@ class MatchmakingActivity : AppCompatActivity() {
     }
     
     /**
+     * Crea un debate entre el usuario actual y un oponente.
+     * 
+     * @param currentUserId ID del usuario actual
+     * @param opponentId ID del oponente
+     * @param topicName Nombre del tema
+     * @param isCurrentUserFavor True si el usuario actual está a favor
+     * @return ID del debate creado o null si hubo un error
+     */
+    private suspend fun createDebateWithOpponent(
+        currentUserId: String,
+        opponentId: String,
+        topicName: String,
+        isCurrentUserFavor: Boolean
+    ): String? {
+        try {
+            // Obtener información del tema
+            val topic = repositoryProvider.topicRepository.getTopicByName(topicName)
+            if (topic == null) {
+                Timber.e("No se pudo encontrar el tema: $topicName")
+                return null
+            }
+            
+            // Determinar quién está a favor y quién en contra
+            val favorUserId = if (isCurrentUserFavor) currentUserId else opponentId
+            val contraUserId = if (isCurrentUserFavor) opponentId else currentUserId
+            
+            // Crear el debate
+            val debateId = repositoryProvider.debateRepository.createDebate(
+                title = topic.topicName,
+                description = topic.description,
+                authorUserId = currentUserId, // El usuario actual es el autor
+                participantFavorUserId = favorUserId,
+                participantContraUserId = contraUserId,
+                category = "matchmaking" // Categoría especial para debates de matchmaking
+            )
+            
+            // Sincronizar inmediatamente con Firebase
+            repositoryProvider.firebaseService.syncAllData()
+            
+            // Notificar al oponente mediante una llamada POST a Firestore
+            sendDebateNotification(debateId, opponentId, topic.topicName)
+            
+            Timber.d("Debate creado con ID: $debateId entre usuarios $favorUserId y $contraUserId sobre tema $topicName")
+            return debateId
+            
+        } catch (e: Exception) {
+            Timber.e(e, "Error al crear debate durante matchmaking")
+            return null
+        }
+    }
+    
+    /**
+     * Envía una notificación al oponente sobre el nuevo debate.
+     * Utiliza una llamada POST directa a Firestore.
+     */
+    private suspend fun sendDebateNotification(debateId: String, opponentId: String, topicName: String) {
+        try {
+            val notification = hashMapOf(
+                "type" to "new_debate",
+                "debateId" to debateId,
+                "topicName" to topicName,
+                "timestamp" to System.currentTimeMillis(),
+                "read" to false
+            )
+            
+            // Usar una colección específica para notificaciones
+            repositoryProvider.firebaseService.firestore
+                .collection("notifications")
+                .document("${opponentId}_${debateId}")
+                .set(notification)
+                .await()
+            
+            Timber.d("Notificación enviada al usuario $opponentId sobre el debate $debateId")
+        } catch (e: Exception) {
+            Timber.e(e, "Error al enviar notificación: ${e.message}")
+            // No interrumpimos el flujo principal si falla la notificación
+        }
+    }
+    
+    /**
      * Realiza la lógica de matchmaking buscando usuarios con posturas opuestas.
      */
     private fun performMatchmaking() {
@@ -197,12 +279,16 @@ class MatchmakingActivity : AppCompatActivity() {
                     return@launch
                 }
                 
-                // Intentar encontrar un emparejamiento para cada postura relevante
-                for (stance in relevantStances) {
-                    val match = findMatchingOpponent(stance, currentUserId)
+                // Buscar potenciales oponentes usando una llamada GET a Firestore
+                val potentialMatches = findPotentialOpponentsFromFirestore(relevantStances, currentUserId)
+                
+                if (potentialMatches.isNotEmpty()) {
+                    // Tomar el primer match encontrado
+                    val match = potentialMatches.first()
                     
-                    if (match != null) {
-                        // Crear un debate con el oponente encontrado
+                    // Crear un debate con el oponente encontrado
+                    val stance = relevantStances.find { it.topicName == match.topicName }
+                    if (stance != null) {
                         val debateId = createDebateWithOpponent(
                             currentUserId, 
                             match.userId, 
@@ -228,6 +314,39 @@ class MatchmakingActivity : AppCompatActivity() {
                             return@launch
                         }
                     }
+                } else {
+                    // Intentar el método anterior como fallback
+                    for (stance in relevantStances) {
+                        val match = findMatchingOpponent(stance, currentUserId)
+                        
+                        if (match != null) {
+                            // Crear un debate con el oponente encontrado
+                            val debateId = createDebateWithOpponent(
+                                currentUserId, 
+                                match.userId, 
+                                stance.topicName,
+                                stance.stance == favorString
+                            )
+                            
+                            if (debateId != null) {
+                                withContext(Dispatchers.Main) {
+                                    // Detener la búsqueda
+                                    stopSearching()
+                                    
+                                    // Mostrar mensaje de éxito
+                                    Toast.makeText(
+                                        this@MatchmakingActivity,
+                                        getString(R.string.matchmaking_success, match.topicName),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    
+                                    // Navegar al debate creado
+                                    navigateToDebate(debateId)
+                                }
+                                return@launch
+                            }
+                        }
+                    }
                 }
                 
                 // No se encontró emparejamiento en esta iteración
@@ -245,6 +364,63 @@ class MatchmakingActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+    
+    /**
+     * Busca oponentes potenciales directamente desde Firestore usando una llamada GET.
+     * 
+     * @param userStances Las posturas del usuario actual
+     * @param currentUserId ID del usuario actual
+     * @return Lista de potenciales emparejamientos
+     */
+    private suspend fun findPotentialOpponentsFromFirestore(
+        userStances: List<UserStanceEntity>,
+        currentUserId: String
+    ): List<UserStanceEntity> {
+        val matches = mutableListOf<UserStanceEntity>()
+        
+        try {
+            val firestore = repositoryProvider.firebaseService.firestore
+            
+            // Para cada postura del usuario, buscar oponentes con postura opuesta
+            for (stance in userStances) {
+                val favorString = getString(R.string.opinion_favor)
+                val contraString = getString(R.string.opinion_against)
+                
+                // Determinar la postura opuesta
+                val oppositeStance = if (stance.stance == favorString) contraString else favorString
+                
+                // Realizar una consulta a Firestore para encontrar usuarios con la postura opuesta
+                val query = firestore.collection("user_stances")
+                    .whereEqualTo("topicName", stance.topicName)
+                    .whereEqualTo("stance", oppositeStance)
+                    .get()
+                    .await()
+                
+                // Filtrar para excluir al usuario actual
+                val potentialMatches = query.documents.mapNotNull { doc ->
+                    val userId = doc.getString("userId") ?: return@mapNotNull null
+                    if (userId != currentUserId) {
+                        UserStanceEntity(
+                            userId = userId,
+                            topicName = stance.topicName,
+                            stance = oppositeStance,
+                            updatedAt = doc.getLong("updatedAt") ?: System.currentTimeMillis()
+                        )
+                    } else {
+                        null
+                    }
+                }
+                
+                matches.addAll(potentialMatches)
+            }
+            
+            Timber.d("Encontrados ${matches.size} potenciales oponentes en Firestore")
+        } catch (e: Exception) {
+            Timber.e(e, "Error al buscar oponentes en Firestore: ${e.message}")
+        }
+        
+        return matches
     }
     
     /**
@@ -269,52 +445,6 @@ class MatchmakingActivity : AppCompatActivity() {
         // Encontrar usuarios con la postura opuesta, excluyendo al usuario actual
         return allStancesOnTopic.find { 
             it.userId != currentUserId && it.stance == oppositeStance 
-        }
-    }
-    
-    /**
-     * Crea un debate entre el usuario actual y un oponente.
-     * 
-     * @param currentUserId ID del usuario actual
-     * @param opponentId ID del oponente
-     * @param topicName Nombre del tema
-     * @param isCurrentUserFavor True si el usuario actual está a favor
-     * @return ID del debate creado o null si hubo un error
-     */
-    private suspend fun createDebateWithOpponent(
-        currentUserId: String,
-        opponentId: String,
-        topicName: String,
-        isCurrentUserFavor: Boolean
-    ): String? {
-        try {
-            // Obtener información del tema
-            val topic = repositoryProvider.topicRepository.getTopicByName(topicName)
-            if (topic == null) {
-                Timber.e("No se pudo encontrar el tema: $topicName")
-                return null
-            }
-            
-            // Determinar quién está a favor y quién en contra
-            val favorUserId = if (isCurrentUserFavor) currentUserId else opponentId
-            val contraUserId = if (isCurrentUserFavor) opponentId else currentUserId
-            
-            // Crear el debate
-            val debateId = repositoryProvider.debateRepository.createDebate(
-                title = topic.topicName,
-                description = topic.description,
-                authorUserId = currentUserId, // El usuario actual es el autor
-                participantFavorUserId = favorUserId,
-                participantContraUserId = contraUserId,
-                category = "matchmaking" // Categoría especial para debates de matchmaking
-            )
-            
-            Timber.d("Debate creado con ID: $debateId entre usuarios $favorUserId y $contraUserId sobre tema $topicName")
-            return debateId
-            
-        } catch (e: Exception) {
-            Timber.e(e, "Error al crear debate durante matchmaking")
-            return null
         }
     }
     
@@ -355,4 +485,4 @@ class MatchmakingActivity : AppCompatActivity() {
         // Asegurar que se detengan todas las búsquedas
         handler.removeCallbacks(searchRunnable)
     }
-} 
+}

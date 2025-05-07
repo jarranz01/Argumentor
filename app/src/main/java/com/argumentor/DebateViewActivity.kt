@@ -7,12 +7,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.argumentor.database.RepositoryProvider
 import com.argumentor.databinding.ActivityDebateViewBinding
 import com.argumentor.fragments.DebateStageFragment
 import com.argumentor.models.DebateStage
 import com.argumentor.viewmodels.DebateViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import timber.log.Timber
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Actividad principal para la visualización y participación en un debate.
@@ -25,6 +30,8 @@ class DebateViewActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDebateViewBinding
     private val viewModel: DebateViewModel by viewModels()
     private lateinit var observer: MyObserver
+    private lateinit var sessionManager: SessionManager
+    private lateinit var repositoryProvider: RepositoryProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +45,10 @@ class DebateViewActivity : AppCompatActivity() {
             binding.lifecycleOwner = this
             binding.viewModel = viewModel
             
+            // Inicializar repositorio y session manager
+            repositoryProvider = RepositoryProvider.getInstance(this)
+            sessionManager = SessionManager(this)
+            
             // Obtener ID del debate desde los extras
             val debateId = intent.getStringExtra("debate_id")
             if (debateId.isNullOrEmpty()) {
@@ -48,7 +59,6 @@ class DebateViewActivity : AppCompatActivity() {
             }
             
             // Obtener el userId del SessionManager
-            val sessionManager = SessionManager(this)
             val userId = sessionManager.getUserId()
             if (userId.isNullOrEmpty()) {
                 Timber.e("Usuario no autenticado")
@@ -133,6 +143,69 @@ class DebateViewActivity : AppCompatActivity() {
             binding.viewPager.setCurrentItem(stage.ordinal, true)
         } catch (e: Exception) {
             Timber.e(e, "Error al navegar a la etapa $stage")
+        }
+    }
+
+    /**
+     * Actualiza el estado del debate y avanza a la siguiente fase si es necesario.
+     */
+    private fun updateDebateStageIfNeeded() {
+        viewModel.currentDebateId.observe(this) { debateId ->
+            if (debateId.isNullOrEmpty()) return@observe
+            
+            val currentStage = viewModel.currentStage.value ?: return@observe
+            
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val advanced = repositoryProvider.debateRepository
+                        .advanceDebateStageIfComplete(debateId, currentStage.name)
+                    
+                    if (advanced) {
+                        // Sincronizar con Firebase después de actualizar el debate
+                        repositoryProvider.firebaseService.syncAllData()
+                        
+                        withContext(Dispatchers.Main) {
+                            // Actualizar la UI para reflejar la nueva fase
+                            viewModel.refreshDebate()
+                        }
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Error al avanzar la fase del debate")
+                }
+            }
+        }
+    }
+
+    /**
+     * Guarda un argumento en la base de datos.
+     */
+    private fun saveArgument(content: String, position: String) {
+        viewModel.currentDebateId.observe(this) { debateId ->
+            if (debateId.isNullOrEmpty()) return@observe
+            
+            val currentStage = viewModel.currentStage.value ?: return@observe
+            val userId = sessionManager.getUserId() ?: return@observe
+            
+            viewModel.saveArgument(debateId, userId, currentStage.name, position, content)
+                .observe(this) { success ->
+                    if (success) {
+                        // Sincronizar con Firebase después de guardar un argumento
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                repositoryProvider.firebaseService.syncAllData()
+                                Timber.d("Argumento sincronizado con Firebase")
+                            } catch (e: Exception) {
+                                Timber.e(e, "Error al sincronizar argumento con Firebase")
+                            }
+                        }
+                        
+                        // Actualizar la UI
+                        updateDebateStageIfNeeded()
+                        Toast.makeText(this, R.string.argument_saved_message, Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, R.string.error_saving_argument, Toast.LENGTH_SHORT).show()
+                    }
+                }
         }
     }
 }

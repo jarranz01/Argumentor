@@ -10,12 +10,24 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "users")
 data class UserEntity(
     @PrimaryKey
-    val userId: String,
-    val name: String,
+    val userId: String = "",
+    val name: String = "",
     val email: String? = null,
     val password: String = "", // Ya no almacenamos la contraseña real, solo un marcador vacío
     val username: String = "", // Nombre de usuario específico para mostrar en la UI
     val createdAt: Long = System.currentTimeMillis(),
     val lastSyncTimestamp: Long = 0, // Marca de tiempo para seguimiento de sincronización
     val profilePhotoUrl: String? = null // URL de la foto de perfil en Firebase Storage
-)
+) {
+    // Constructor sin argumentos requerido para Firebase Firestore
+    constructor() : this(
+        userId = "",
+        name = "",
+        email = null,
+        password = "",
+        username = "",
+        createdAt = System.currentTimeMillis(),
+        lastSyncTimestamp = 0,
+        profilePhotoUrl = null
+    )
+}

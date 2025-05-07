@@ -40,7 +40,7 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        // Establecer la selección inicial basada en la configuración actual del idioma
+        // Establecer la selección basada en la configuración actual del idioma
         setupLanguageSelection()
 
         // Configurar el botón de cierre de sesión
@@ -53,13 +53,19 @@ class SettingsActivity : AppCompatActivity() {
     private fun setupLanguageSelection() {
         // Obtener la configuración regional actual para establecer el botón de radio correcto
         val currentLanguage = getCurrentLanguage()
+        
+        Timber.d("Idioma actual detectado: $currentLanguage")
 
         // Seleccionar el botón de radio apropiado según el idioma actual
         if (currentLanguage.startsWith("es")) {
             binding.radioSpanish.isChecked = true
+            binding.radioEnglish.isChecked = false
+            Timber.d("Seleccionando español en los radio buttons")
         } else {
             // Por defecto, inglés para cualquier otro idioma
             binding.radioEnglish.isChecked = true
+            binding.radioSpanish.isChecked = false
+            Timber.d("Seleccionando inglés en los radio buttons (por defecto)")
         }
 
         // Establecer el listener para los cambios de idioma
@@ -67,6 +73,12 @@ class SettingsActivity : AppCompatActivity() {
             val languageCode = when (checkedId) {
                 R.id.radioSpanish -> "es"
                 else -> "en"
+            }
+
+            // Evitar cambiar al mismo idioma
+            if (languageCode == currentLanguage) {
+                Timber.d("El idioma seleccionado es el mismo que el actual: $languageCode")
+                return@setOnCheckedChangeListener
             }
 
             // Guardar la preferencia de idioma seleccionada
@@ -122,7 +134,7 @@ class SettingsActivity : AppCompatActivity() {
         val preferences = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
         preferences.edit().apply {
             putString("language", languageCode)
-            apply()
+            commit() // Usar commit en lugar de apply para asegurar escritura inmediata
         }
 
         // Aplicar la nueva configuración regional
@@ -132,8 +144,13 @@ class SettingsActivity : AppCompatActivity() {
         val config = Configuration(resources.configuration)
         config.setLocale(locale)
         
-        // Usar createConfigurationContext en lugar de updateConfiguration
+        // Actualizar la configuración de recursos
+        resources.updateConfiguration(config, resources.displayMetrics)
+        
+        // También crear un nuevo contexto con la configuración actualizada
         createConfigurationContext(config)
+        
+        Timber.d("Idioma cambiado a $languageCode en SettingsActivity")
     }
 
     /**
@@ -149,12 +166,14 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * Obtiene el código de idioma actual de las preferencias compartidas o del sistema por defecto.
+     * Obtiene el código de idioma actual de las preferencias compartidas.
+     * Si no hay un idioma guardado, utiliza el idioma del sistema como predeterminado.
      *
      * @return El código de idioma ISO (por ejemplo, "en" o "es")
      */
     private fun getCurrentLanguage(): String {
         val preferences = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-        return preferences.getString("language", Locale.getDefault().language) ?: "en"
+        return preferences.getString("language", Locale.getDefault().language) 
+            ?: Locale.getDefault().language
     }
 }

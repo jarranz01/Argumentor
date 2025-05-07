@@ -9,6 +9,12 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "topics")
 data class TopicEntity(
     @PrimaryKey
-    val topicName: String,
-    val description: String
-)
+    val topicName: String = "",
+    val description: String = ""
+) {
+    // Constructor sin argumentos requerido para Firebase Firestore
+    constructor() : this(
+        topicName = "",
+        description = ""
+    )
+}
