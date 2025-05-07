@@ -42,8 +42,10 @@ class ArgumentorApplicationDISABLED : Application() {
         val config = Configuration(resources.configuration)
         config.setLocale(locale)
         
-        val context = createConfigurationContext(config)
-        resources.updateConfiguration(context.resources.configuration, context.resources.displayMetrics)
+        // Crear un nuevo contexto con la configuración actualizada
+        createConfigurationContext(config)
+        
+        // No es necesario llamar a updateConfiguration, que está obsoleto
 
         Timber.d("Idioma aplicado al iniciar la app: $languageCode")
     }

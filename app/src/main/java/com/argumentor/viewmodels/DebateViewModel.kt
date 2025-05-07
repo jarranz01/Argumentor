@@ -115,7 +115,13 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
                 }
                 
                 // Cargar las entradas del debate
-                loadDebateEntries()
+                try {
+                    loadDebateEntries()
+                } catch (e: Exception) {
+                    Timber.e(e, "Error al cargar las entradas del debate")
+                    _errorMessage.value = "Error al cargar las entradas: ${e.message}"
+                    _isLoading.value = false
+                }
                 
             } catch (e: Exception) {
                 Timber.e(e, "Error al cargar el debate")
@@ -259,7 +265,7 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
                     content = content
                 )
                 
-                // Actualizar las entradas localmente (podríamos recargar desde la BD también)
+                // Actualizar las entradas localmente
                 val currentEntries = _debateEntries.value?.toMutableMap() ?: mutableMapOf()
                 val stageEntries = currentEntries[currentStage]?.toMutableMap() ?: mutableMapOf()
                 stageEntries[userPosition] = newEntry
@@ -272,8 +278,18 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
                 // Verificar si se debe avanzar la etapa del debate
                 val isPhaseComplete = debateRepository.isDebatePhaseComplete(debateId, currentStage.name)
                 if (isPhaseComplete) {
-                    debateRepository.advanceDebateStageIfComplete(debateId, currentStage.name)
+                    val wasAdvanced = debateRepository.advanceDebateStageIfComplete(debateId, currentStage.name)
+                    if (wasAdvanced) {
+                        // Actualizar la etapa actual del debate
+                        val nextStage = getNextStage(currentStage)
+                        if (nextStage != null) {
+                            _currentStage.value = nextStage
+                        }
+                    }
                 }
+                
+                // Recargar los datos del debate para asegurar consistencia
+                loadDebate()
                 
                 _isLoading.value = false
                 
@@ -286,6 +302,18 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
         }
         
         return true
+    }
+    
+    /**
+     * Determina la siguiente etapa del debate.
+     */
+    private fun getNextStage(currentStage: DebateStage): DebateStage? {
+        return when (currentStage) {
+            DebateStage.INTRODUCCION -> DebateStage.REFUTACION1
+            DebateStage.REFUTACION1 -> DebateStage.REFUTACION2
+            DebateStage.REFUTACION2 -> DebateStage.CONCLUSION
+            DebateStage.CONCLUSION -> null
+        }
     }
     
     /**
@@ -371,6 +399,65 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
         }
         
         return null
+    }
+    
+    /**
+     * Obtiene la posición del usuario en el debate.
+     * 
+     * @return La posición del usuario (A_FAVOR o EN_CONTRA)
+     */
+    fun getUserPosition(): DebatePosition {
+        // Si userPosition no está inicializada, devolver un valor por defecto
+        if (!::userPosition.isInitialized) {
+            Timber.w("getUserPosition llamado antes de inicializar userPosition, devolviendo valor por defecto")
+            return DebatePosition.A_FAVOR
+        }
+        return userPosition
+    }
+    
+    /**
+     * Obtiene una entrada específica para una etapa y posición concretas.
+     * 
+     * @param stage La etapa del debate
+     * @param position La posición (A_FAVOR o EN_CONTRA)
+     * @return La entrada correspondiente, o null si no existe
+     */
+    fun getEntryForStageAndPosition(stage: DebateStage, position: DebatePosition): DebateEntry? {
+        val entries = _debateEntries.value ?: return null
+        val stageEntries = entries[stage] ?: return null
+        return stageEntries[position]
+    }
+    
+    /**
+     * Comprueba si una etapa específica ha sido completada por ambos participantes.
+     * 
+     * @param stage La etapa a comprobar
+     * @return true si ambos participantes han completado la etapa
+     */
+    fun isStageBothCompleted(stage: DebateStage): Boolean {
+        val entries = _debateEntries.value ?: return false
+        val stageEntries = entries[stage] ?: return false
+        return stageEntries.size == 2 // Hay entradas tanto para A_FAVOR como para EN_CONTRA
+    }
+    
+    /**
+     * Actualiza los datos del debate desde la base de datos.
+     * Útil para detectar cuando el oponente ha respondido.
+     */
+    fun refreshDebate() {
+        viewModelScope.launch {
+            try {
+                // No mostrar indicador de carga para no interrumpir la experiencia del usuario
+                _errorMessage.value = null
+                
+                // Recargar las entradas del debate
+                loadDebateEntries()
+                
+            } catch (e: Exception) {
+                Timber.e(e, "Error al actualizar el debate")
+                // No mostrar mensaje de error para no interrumpir la experiencia
+            }
+        }
     }
     
     /**

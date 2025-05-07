@@ -21,6 +21,16 @@
     <string name="register_button">Registrarse</string>
     <string name="empty_fields_error">Por favor, complete todos los campos</string>
     <string name="registration_successful">Registro exitoso</string>
+    <string name="login_successful">Inicio de sesión exitoso</string>
+    <string name="login_failed">Error de inicio de sesión: %1$s</string>
+    <string name="registration_failed">Error de registro: %1$s</string>
+    <string name="firebase_error_invalid_email">Dirección de correo electrónico no válida</string>
+    <string name="firebase_error_user_not_found">Usuario no encontrado</string>
+    <string name="firebase_error_wrong_password">Contraseña incorrecta</string>
+    <string name="firebase_error_email_already_in_use">El correo electrónico ya está en uso</string>
+    <string name="firebase_error_weak_password">La contraseña es demasiado débil</string>
+    <string name="firebase_error_network">Error de red. Comprueba tu conexión</string>
+    <string name="firebase_error_generic">Error de autenticación. Inténtalo más tarde</string>
     <string name="session_expired_message">Tu sesión ha caducado por inactividad</string>
 
     <!-- Formulario -->
@@ -53,21 +63,47 @@
     <string name="welcome_message">Bienvenido a Argumentor</string>
     <string name="welcome_message_with_name">Bienvenido a Argumentor, %1$s</string>
     <string name="matchmaking">Emparejamiento</string>
+    <string name="matchmaking_description">¡Encuentra oponentes con opiniones opuestas en temas que te importan!</string>
+    <string name="matchmaking_info">Buscaremos usuarios con opiniones opuestas en temas que has marcado como \"A favor\" o \"En contra\".</string>
+    <string name="start_searching">Comenzar búsqueda</string>
+    <string name="stop_searching">Detener búsqueda</string>
+    <string name="searching_for_opponent">Buscando oponente</string>
+    <string name="matchmaking_success">¡Coincidencia encontrada en el tema: %1$s!</string>
+    <string name="matchmaking_error">Error durante el emparejamiento: %1$s</string>
+    <string name="no_stances_for_matchmaking">Necesitas seleccionar \"A favor\" o \"En contra\" para al menos un tema</string>
     <string name="debate_board">Tablón de debates</string>
     <string name="my_debates">Mis Debates</string>
     <string name="my_stances">Mis Posturas</string>
     <string name="settings">Ajustes</string>
 
+    <string name="no_my_debates">No has participado en ningún debate aún</string>
+    <string name="ongoing_debates">Debates en curso</string>
+    <string name="completed_debates">Debates completados</string>
+    <string name="expand_collapse">Expandir/Colapsar</string>
+    <string name="no_ongoing_debates">No tienes debates en curso</string>
+    <string name="no_completed_debates">No tienes debates completados</string>
     <string name="no_debates_yet">No hay debates aún. ¡Crea uno!</string>
     <string name="create_debate">Crear Debate</string>
     <string name="debate_title">Título del debate</string>
     <string name="debate_description">Describe el tema del debate…</string>
     <string name="join_debate">Unirse al debate</string>
+    <string name="join_position">Unirse como %1$s</string>
+    <string name="debate_full">El debate está completo</string>
+    <string name="select_your_position">Selecciona tu posición:</string>
+    <string name="position_available">Posición disponible: %1$s</string>
     <string name="create">Crear</string>
     <string name="cancel">Cancelar</string>
     <string name="created_by">Creado por: %1$s</string>
     <string name="current_user">Tú</string>
     <string name="joined_debate">Te has unido al debate: %1$s</string>
+    <string name="debate_created">Debate creado</string>
+    <string name="join_debate_success">Te has unido al debate</string>
+    <string name="cannot_join_own_debate">No puedes unirte a tu propio debate</string>
+    <string name="user_already_in_debate">Ya estás participando en este debate</string>
+    <string name="prev_opponent_response">Respuesta previa del oponente</string>
+    <string name="show_opponent_response">Mostrar respuesta del oponente</string>
+    <string name="hide_opponent_response">Ocultar respuesta del oponente</string>
+    <string name="must_wait_for_opponent">Debes esperar a que tu oponente responda</string>
 
     <!-- Debate View -->
     <string name="debate_view_title">Vista del Debate</string>

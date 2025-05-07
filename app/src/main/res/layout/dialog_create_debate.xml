@@ -23,6 +23,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -33,5 +34,32 @@
             android:inputType="textMultiLine"
             android:minLines="3" />
     </com.google.android.material.textfield.TextInputLayout>
+    
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/select_your_position"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+        
+    <RadioGroup
+        android:id="@+id/radioGroupPosition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        
+        <RadioButton
+            android:id="@+id/radioPositionFavor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/position_favor"
+            android:checked="true" />
+            
+        <RadioButton
+            android:id="@+id/radioPositionAgainst"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/position_against" />
+    </RadioGroup>
 
 </LinearLayout>

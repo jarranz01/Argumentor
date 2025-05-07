@@ -197,11 +197,15 @@ class ArgumentorApplication : Application() {
         val locale = Locale(languageCode)
         Locale.setDefault(locale)
 
+        // Crear una nueva configuración con el idioma seleccionado
         val config = Configuration(resources.configuration)
         config.setLocale(locale)
         
-        val context = createConfigurationContext(config)
-        resources.updateConfiguration(context.resources.configuration, context.resources.displayMetrics)
+        // Crear un nuevo contexto con la configuración actualizada
+        createConfigurationContext(config)
+        
+        // No es necesario llamar a updateConfiguration, que está obsoleto
+        // El sistema usará la configuración del contexto creado arriba
 
         Timber.d("Idioma aplicado al iniciar la app: $languageCode")
     }

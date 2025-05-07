@@ -133,8 +133,7 @@ class SettingsActivity : AppCompatActivity() {
         config.setLocale(locale)
         
         // Usar createConfigurationContext en lugar de updateConfiguration
-        val context = createConfigurationContext(config)
-        resources.updateConfiguration(context.resources.configuration, context.resources.displayMetrics)
+        createConfigurationContext(config)
     }
 
     /**

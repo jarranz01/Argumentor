@@ -1,6 +1,8 @@
 package com.argumentor.fragments
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -10,6 +12,9 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import com.argumentor.DebateViewActivity
 import com.argumentor.R
 import com.argumentor.databinding.FragmentDebateStageBinding
 import com.argumentor.models.DebatePosition
@@ -17,6 +22,8 @@ import com.argumentor.models.DebateStage
 import com.argumentor.viewmodels.DebateViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+import timber.log.Timber
 
 /**
  * Fragmento que representa una etapa específica en el debate.
@@ -37,6 +44,7 @@ class DebateStageFragment : Fragment() {
     
     companion object {
         private const val ARG_STAGE = "debate_stage"
+        private const val REFRESH_INTERVAL = 10000L // 10 segundos
         
         /**
          * Crea una nueva instancia del fragmento para la etapa especificada.
@@ -86,13 +94,16 @@ class DebateStageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         setupStageInfo()
-        setupOpponentArgument()
+        setupPreviousOpponentResponse()
         setupResponseArea()
         checkCompletionStatus()
         
+        // Configurar actualización periódica para detectar respuestas del oponente
+        setupPeriodicUpdates()
+        
         // Observar cambios que puedan afectar a la visualización
         viewModel.debateEntries.observe(viewLifecycleOwner) { entries ->
-            setupOpponentArgument()
+            setupPreviousOpponentResponse()
             checkCompletionStatus()
         }
         
@@ -105,60 +116,115 @@ class DebateStageFragment : Fragment() {
      * Configura la información sobre la etapa actual y posición.
      */
     private fun setupStageInfo() {
-        // Establecer el título según la etapa
-        val stageTitle = when (debateStage) {
-            DebateStage.INTRODUCCION -> getString(R.string.stage_introduction)
-            DebateStage.REFUTACION1 -> getString(R.string.stage_refutation1)
-            DebateStage.REFUTACION2 -> getString(R.string.stage_refutation2)
-            DebateStage.CONCLUSION -> getString(R.string.stage_conclusion)
-        }
-        binding.textStage.text = stageTitle
-        
-        // Establecer instrucciones
-        binding.textInstructions.text = viewModel.getInstructionForStage(debateStage)
-        
-        // Configurar el chip de posición
-        viewModel.debate.observe(viewLifecycleOwner) { debate ->
-            val userPosition = if (viewModel.debate.value?.participantFavor == "Usuario1") {
-                DebatePosition.A_FAVOR
-            } else {
-                DebatePosition.EN_CONTRA
+        try {
+            // Establecer el título según la etapa
+            val stageTitle = when (debateStage) {
+                DebateStage.INTRODUCCION -> getString(R.string.stage_introduction)
+                DebateStage.REFUTACION1 -> getString(R.string.stage_refutation1)
+                DebateStage.REFUTACION2 -> getString(R.string.stage_refutation2)
+                DebateStage.CONCLUSION -> getString(R.string.stage_conclusion)
+            }
+            binding.textStage.text = stageTitle
+            
+            // Establecer instrucciones
+            try {
+                binding.textInstructions.text = viewModel.getInstructionForStage(debateStage)
+            } catch (e: Exception) {
+                Timber.e(e, "Error al obtener instrucciones para la etapa")
+                binding.textInstructions.text = ""
             }
             
-            val positionText = when (userPosition) {
-                DebatePosition.A_FAVOR -> getString(R.string.position_favor)
-                DebatePosition.EN_CONTRA -> getString(R.string.position_against)
+            // Configurar el chip de posición de forma segura
+            try {
+                // Configurar el chip de posición inmediatamente con la posición actual
+                val userPosition = viewModel.getUserPosition()
+                val positionText = when (userPosition) {
+                    DebatePosition.A_FAVOR -> getString(R.string.position_favor)
+                    DebatePosition.EN_CONTRA -> getString(R.string.position_against)
+                }
+                
+                binding.chipPosition.text = positionText
+                
+                // Establecer color según la posición
+                val colorRes = when (userPosition) {
+                    DebatePosition.A_FAVOR -> android.R.color.holo_green_light
+                    DebatePosition.EN_CONTRA -> android.R.color.holo_red_light
+                }
+                
+                // Verificar que el contexto esté disponible antes de usar ContextCompat
+                if (isAdded && !isDetached && context != null) {
+                    binding.chipPosition.chipBackgroundColor = 
+                        ContextCompat.getColorStateList(requireContext(), colorRes)
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Error al configurar el chip de posición")
+                // Configurar un valor por defecto para evitar UI vacía
+                binding.chipPosition.text = getString(R.string.position_favor)
             }
-            
-            binding.chipPosition.text = positionText
-            
-            // Establecer color según la posición
-            val colorRes = when (userPosition) {
-                DebatePosition.A_FAVOR -> android.R.color.holo_green_light
-                DebatePosition.EN_CONTRA -> android.R.color.holo_red_light
-            }
-            binding.chipPosition.chipBackgroundColor = 
-                ContextCompat.getColorStateList(requireContext(), colorRes)
+        } catch (e: Exception) {
+            Timber.e(e, "Error en setupStageInfo")
         }
     }
     
     /**
-     * Configura la visualización del argumento del oponente, si corresponde.
+     * Configura la visualización de la respuesta previa del oponente (si existe).
+     * Visible en etapas REFUTACION1, REFUTACION2 y CONCLUSION.
      */
-    private fun setupOpponentArgument() {
-        // Solo aplica para refutaciones y conclusión
-        if (debateStage == DebateStage.INTRODUCCION) {
-            binding.cardOpponentArgument.visibility = View.GONE
-            return
-        }
-        
-        val opponentEntry = viewModel.getOpponentEntryToRefute(debateStage)
-        
-        if (opponentEntry != null) {
-            binding.textOpponentArgument.text = opponentEntry.content
-            binding.cardOpponentArgument.visibility = View.VISIBLE
-        } else {
-            binding.cardOpponentArgument.visibility = View.GONE
+    private fun setupPreviousOpponentResponse() {
+        try {
+            // Solo aplica para refutación 1, 2 y conclusión
+            if (debateStage == DebateStage.INTRODUCCION) {
+                binding.cardPrevOpponentArgument.visibility = View.GONE
+                return
+            }
+            
+            // Obtener la respuesta del oponente en la etapa anterior a la actual
+            val previousStage = when (debateStage) {
+                DebateStage.REFUTACION1 -> DebateStage.INTRODUCCION
+                DebateStage.REFUTACION2 -> DebateStage.REFUTACION1
+                DebateStage.CONCLUSION -> DebateStage.REFUTACION2
+                else -> null
+            }
+            
+            try {
+                val previousOpponentEntry = previousStage?.let { prevStage ->
+                    val opponentPosition = if (viewModel.getUserPosition() == DebatePosition.A_FAVOR) {
+                        DebatePosition.EN_CONTRA
+                    } else {
+                        DebatePosition.A_FAVOR
+                    }
+                    viewModel.getEntryForStageAndPosition(prevStage, opponentPosition)
+                }
+                
+                if (previousOpponentEntry != null) {
+                    binding.cardPrevOpponentArgument.visibility = View.VISIBLE
+                    binding.textPrevOpponentArgument.text = previousOpponentEntry.content
+                    
+                    // Configurar comportamiento del botón para mostrar/ocultar
+                    binding.buttonTogglePrevResponse.setOnClickListener {
+                        try {
+                            val isVisible = binding.textPrevOpponentArgument.visibility == View.VISIBLE
+                            if (isVisible) {
+                                binding.textPrevOpponentArgument.visibility = View.GONE
+                                binding.buttonTogglePrevResponse.text = getString(R.string.show_opponent_response)
+                            } else {
+                                binding.textPrevOpponentArgument.visibility = View.VISIBLE
+                                binding.buttonTogglePrevResponse.text = getString(R.string.hide_opponent_response)
+                            }
+                        } catch (e: Exception) {
+                            Timber.e(e, "Error al cambiar visibilidad de respuesta del oponente")
+                        }
+                    }
+                } else {
+                    binding.cardPrevOpponentArgument.visibility = View.GONE
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Error al obtener entrada del oponente")
+                binding.cardPrevOpponentArgument.visibility = View.GONE
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error en setupPreviousOpponentResponse")
+            binding.cardPrevOpponentArgument.visibility = View.GONE
         }
     }
     
@@ -189,8 +255,28 @@ class DebateStageFragment : Fragment() {
             val content = binding.editResponse.text.toString().trim()
             if (content.isNotEmpty() && content.length <= MAX_CHARS) {
                 if (viewModel.submitEntry(content)) {
-                    Snackbar.make(binding.root, R.string.debate_stage_complete, Snackbar.LENGTH_SHORT).show()
-                    checkCompletionStatus()
+                    // Mostrar mensaje de confirmación
+                    Snackbar.make(binding.root, R.string.debate_stage_complete, LENGTH_SHORT).show()
+                    
+                    // Actualizar la UI inmediatamente
+                    binding.textSubmittedResponse.text = content
+                    binding.textSubmittedResponse.visibility = View.VISIBLE
+                    binding.inputLayout.visibility = View.GONE
+                    binding.buttonSubmit.visibility = View.GONE
+                    binding.textCharacterCount.visibility = View.GONE
+                    
+                    // Mostrar mensaje de espera para la respuesta del oponente
+                    binding.textWaitingState.text = getString(R.string.waiting_for_opponent)
+                    binding.textWaitingState.visibility = View.VISIBLE
+                    
+                    // Observar cambios en la etapa actual para navegar automáticamente
+                    viewModel.currentStage.observe(viewLifecycleOwner) { newStage ->
+                        if (newStage != debateStage) {
+                            // Si la etapa cambió, navegar a la nueva pestaña
+                            val activity = requireActivity() as? DebateViewActivity
+                            activity?.navigateToStage(newStage)
+                        }
+                    }
                 }
             }
         }
@@ -210,34 +296,73 @@ class DebateStageFragment : Fragment() {
                 binding.textSubmittedResponse.visibility = View.VISIBLE
             }
             
-            // Ocultar el campo de entrada
+            // Ocultar el campo de entrada y el botón de submit
             binding.inputLayout.visibility = View.GONE
             binding.buttonSubmit.visibility = View.GONE
             binding.textCharacterCount.visibility = View.GONE
             
             // Mostrar estado de espera si es necesario
-            val opponentHasResponded = when (debateStage) {
-                DebateStage.INTRODUCCION -> viewModel.getOpponentEntryToRefute(DebateStage.REFUTACION1) != null
-                DebateStage.REFUTACION1 -> viewModel.getOpponentEntryToRefute(DebateStage.REFUTACION2) != null
-                DebateStage.REFUTACION2 -> viewModel.getOpponentEntryToRefute(DebateStage.CONCLUSION) != null
-                DebateStage.CONCLUSION -> true // No hay siguiente paso después de la conclusión
-            }
-            
-            if (!opponentHasResponded && debateStage != DebateStage.CONCLUSION) {
-                binding.textWaitingState.visibility = View.VISIBLE
-            } else {
+            // En la fase de introducción, no mostramos mensaje de espera
+            if (debateStage == DebateStage.INTRODUCCION) {
                 binding.textWaitingState.visibility = View.GONE
+            } else {
+                val opponentHasResponded = when (debateStage) {
+                    DebateStage.REFUTACION1 -> viewModel.getOpponentEntryToRefute(DebateStage.REFUTACION1) != null
+                    DebateStage.REFUTACION2 -> viewModel.getOpponentEntryToRefute(DebateStage.REFUTACION2) != null
+                    DebateStage.CONCLUSION -> viewModel.getOpponentEntryToRefute(DebateStage.CONCLUSION) != null
+                    else -> true // Para cualquier otro caso, asumimos que ha respondido
+                }
+                
+                if (!opponentHasResponded) {
+                    binding.textWaitingState.text = getString(R.string.waiting_for_opponent)
+                    binding.textWaitingState.visibility = View.VISIBLE
+                } else {
+                    binding.textWaitingState.visibility = View.GONE
+                }
             }
         } else {
-            // Configurar modo entrada
-            binding.textSubmittedResponse.visibility = View.GONE
-            binding.inputLayout.visibility = View.VISIBLE
-            binding.textCharacterCount.visibility = View.VISIBLE
-            binding.buttonSubmit.visibility = View.VISIBLE
-            binding.textWaitingState.visibility = View.GONE
+            // Verificar si el usuario debe esperar a que el oponente responda en fases anteriores
+            val canUserRespond = when (debateStage) {
+                DebateStage.INTRODUCCION -> true // Siempre puede responder en introducción
+                DebateStage.REFUTACION1 -> {
+                    // Debe tener la introducción de ambos
+                    viewModel.isStageBothCompleted(DebateStage.INTRODUCCION)
+                }
+                DebateStage.REFUTACION2 -> {
+                    // Debe tener la refutación 1 de ambos
+                    viewModel.isStageBothCompleted(DebateStage.REFUTACION1)
+                }
+                DebateStage.CONCLUSION -> {
+                    // Debe tener la refutación 2 de ambos
+                    viewModel.isStageBothCompleted(DebateStage.REFUTACION2)
+                }
+            }
             
-            // Verificar si es turno del usuario
-            updateInputState(viewModel.isUserTurn.value ?: false)
+            if (!canUserRespond) {
+                // No puede responder aún - mostrar mensaje de espera
+                binding.textSubmittedResponse.visibility = View.GONE
+                binding.inputLayout.visibility = View.GONE
+                binding.buttonSubmit.visibility = View.GONE
+                binding.textCharacterCount.visibility = View.GONE
+                
+                // No mostrar mensaje de espera en la introducción
+                if (debateStage == DebateStage.INTRODUCCION) {
+                    binding.textWaitingState.visibility = View.GONE
+                } else {
+                    binding.textWaitingState.text = getString(R.string.must_wait_for_opponent)
+                    binding.textWaitingState.visibility = View.VISIBLE
+                }
+            } else {
+                // Configurar modo entrada
+                binding.textSubmittedResponse.visibility = View.GONE
+                binding.inputLayout.visibility = View.VISIBLE
+                binding.textCharacterCount.visibility = View.VISIBLE
+                binding.buttonSubmit.visibility = View.VISIBLE
+                binding.textWaitingState.visibility = View.GONE
+                
+                // Verificar si es turno del usuario
+                updateInputState(viewModel.isUserTurn.value ?: false)
+            }
         }
     }
     
@@ -255,6 +380,42 @@ class DebateStageFragment : Fragment() {
         } else {
             binding.textWaitingState.visibility = View.GONE
         }
+    }
+    
+    /**
+     * Configura una actualización periódica para detectar cambios en el debate.
+     */
+    private fun setupPeriodicUpdates() {
+        val handler = Handler(Looper.getMainLooper())
+        val refreshRunnable = object : Runnable {
+            override fun run() {
+                try {
+                    // Verificar que el fragmento está adjunto y activo antes de hacer cualquier operación
+                    if (isAdded && !isDetached && !isRemoving && _binding != null) {
+                        viewModel.refreshDebate()
+                        handler.postDelayed(this, REFRESH_INTERVAL)
+                    }
+                } catch (e: Exception) {
+                    // Capturar cualquier excepción para evitar crashes
+                    Timber.e(e, "Error en la actualización periódica")
+                }
+            }
+        }
+        
+        // Iniciar las actualizaciones periódicas
+        handler.postDelayed(refreshRunnable, REFRESH_INTERVAL)
+        
+        // Detener las actualizaciones cuando el fragmento se destruye
+        viewLifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onDestroy(owner: LifecycleOwner) {
+                try {
+                    handler.removeCallbacks(refreshRunnable)
+                } catch (e: Exception) {
+                    // Capturar cualquier excepción para evitar crashes
+                    Timber.e(e, "Error al detener actualizaciones periódicas")
+                }
+            }
+        })
     }
     
     override fun onDestroyView() {

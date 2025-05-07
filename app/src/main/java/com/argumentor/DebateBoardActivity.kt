@@ -14,6 +14,7 @@ import com.argumentor.models.Debate
 import com.argumentor.viewmodels.DebateBoardViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
+import android.widget.RadioGroup
 import timber.log.Timber
 
 /**
@@ -67,17 +68,22 @@ class DebateBoardActivity : AppCompatActivity() {
      * a la vista detallada del debate.
      */
     private fun setupRecyclerView() {
-        adapter = DebateAdapter { debate ->
-            // Mostrar confirmación de unirse al debate
-            Toast.makeText(this, getString(R.string.joined_debate, debate.title), Toast.LENGTH_SHORT).show()
-            Timber.i("Joined debate: ${debate.title}")
-            
-            // Navegar a la vista de debate
-            val intent = Intent(this, DebateViewActivity::class.java).apply {
-                putExtra("debate_id", debate.id)
+        adapter = DebateAdapter(
+            onJoinClick = { debate ->
+                // Intentar unirse al debate (la posición se determina automáticamente)
+                viewModel.joinDebate(debate.id)
+                
+                // Mostrar confirmación de unirse al debate
+                Toast.makeText(this, getString(R.string.join_debate_success), Toast.LENGTH_SHORT).show()
+                Timber.i("Joined debate: ${debate.title}")
+                
+                // Navegar a la vista de debate
+                val intent = Intent(this, DebateViewActivity::class.java).apply {
+                    putExtra("debate_id", debate.id)
+                }
+                startActivity(intent)
             }
-            startActivity(intent)
-        }
+        )
 
         binding.recyclerDebates.layoutManager = LinearLayoutManager(this)
         binding.recyclerDebates.adapter = adapter
@@ -125,6 +131,7 @@ class DebateBoardActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_create_debate, null)
         val titleInput = dialogView.findViewById<TextInputEditText>(R.id.editDebateTitle)
         val descriptionInput = dialogView.findViewById<TextInputEditText>(R.id.editDebateDescription)
+        val radioGroupPosition = dialogView.findViewById<RadioGroup>(R.id.radioGroupPosition)
 
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.create_debate)
@@ -132,11 +139,18 @@ class DebateBoardActivity : AppCompatActivity() {
             .setPositiveButton(R.string.create) { _, _ ->
                 val title = titleInput.text.toString().trim()
                 val description = descriptionInput.text.toString().trim()
+                
+                // Obtener la posición seleccionada
+                val position = when (radioGroupPosition.checkedRadioButtonId) {
+                    R.id.radioPositionFavor -> "A_FAVOR"
+                    R.id.radioPositionAgainst -> "EN_CONTRA"
+                    else -> "A_FAVOR" // Valor por defecto
+                }
 
                 if (title.isNotEmpty() && description.isNotEmpty()) {
-                    val author = getString(R.string.current_user)
-                    viewModel.addDebate(title, description, author)
-                    Timber.i("Created new debate: $title")
+                    viewModel.addDebate(title, description, position)
+                    Toast.makeText(this, R.string.debate_created, Toast.LENGTH_SHORT).show()
+                    Timber.i("Created new debate: $title with position: $position")
                 } else {
                     Toast.makeText(this, R.string.empty_fields_error, Toast.LENGTH_SHORT).show()
                 }

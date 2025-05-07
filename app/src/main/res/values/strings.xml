@@ -32,7 +32,7 @@
     <string name="firebase_error_weak_password">Password is too weak</string>
     <string name="firebase_error_network">Network error. Check your connection</string>
     <string name="firebase_error_generic">Authentication error. Try again later</string>
-    <string name="session_expired_message">Tu sesión ha caducado por inactividad</string>
+    <string name="session_expired_message">Your session has expired due to inactivity</string>
 
     <!-- Formulario -->
     <string name="form_title">Your opinions</string>
@@ -64,21 +64,49 @@
     <string name="welcome_message">Welcome to Argumentor</string>
     <string name="welcome_message_with_name">Welcome to Argumentor, %1$s</string>
     <string name="matchmaking">Matchmaking</string>
+    <string name="matchmaking_description">Find opponents with opposing views on topics you care about!</string>
+    <string name="matchmaking_info">We\'ll look for users with opposing views on topics you\'ve marked as \"In favor\" or \"Against\".</string>
+    <string name="start_searching">Start Searching</string>
+    <string name="stop_searching">Stop Searching</string>
+    <string name="searching_for_opponent">Searching for opponent</string>
+    <string name="matchmaking_success">Match found on topic: %1$s!</string>
+    <string name="matchmaking_error">Error during matchmaking: %1$s</string>
+    <string name="no_stances_for_matchmaking">You need to select \"In favor\" or \"Against\" for at least one topic</string>
     <string name="debate_board">Debate Board</string>
     <string name="my_debates">My Debates</string>
     <string name="my_stances">My Stances</string>
     <string name="settings">Settings</string>
 
+    <string name="no_my_debates">You haven\'t participated in any debates yet</string>
+    <string name="ongoing_debates">Ongoing Debates</string>
+    <string name="completed_debates">Completed Debates</string>
+    <string name="expand_collapse">Expand/Collapse</string>
+    <string name="no_ongoing_debates">You don\'t have any ongoing debates</string>
+    <string name="no_completed_debates">You don\'t have any completed debates</string>
     <string name="no_debates_yet">No debates yet. Create one!</string>
     <string name="create_debate">Create Debate</string>
     <string name="debate_title">Debate Title</string>
     <string name="debate_description">Describe the debate topic…</string>
     <string name="join_debate">Join Debate</string>
+    <string name="join_position">Join as %1$s</string>
+    <string name="debate_full">Debate is full</string>
+    <string name="select_your_position">Select your position:</string>
+    <string name="position_favor">In Favor</string>
+    <string name="position_against">Against</string>
+    <string name="position_available">Position available: %1$s</string>
     <string name="create">Create</string>
     <string name="cancel">Cancel</string>
     <string name="created_by">Created by: %1$s</string>
     <string name="current_user">You</string>
     <string name="joined_debate">You joined the debate: %1$s</string>
+    <string name="debate_created">Debate created</string>
+    <string name="join_debate_success">You have joined the debate</string>
+    <string name="cannot_join_own_debate">You cannot join your own debate</string>
+    <string name="user_already_in_debate">You are already participating in this debate</string>
+    <string name="prev_opponent_response">Previous opponent response</string>
+    <string name="show_opponent_response">Show opponent response</string>
+    <string name="hide_opponent_response">Hide opponent response</string>
+    <string name="must_wait_for_opponent">You must wait for your opponent to respond</string>
 
     <!-- Debate View -->
     <string name="debate_view_title">Debate View</string>
@@ -86,8 +114,6 @@
     <string name="stage_refutation1">First Refutation</string>
     <string name="stage_refutation2">Second Refutation</string>
     <string name="stage_conclusion">Conclusion</string>
-    <string name="position_favor">In Favor</string>
-    <string name="position_against">Against</string>
     <string name="opponents_argument">Opponent\'s Argument:</string>
     <string name="your_response">Your Response:</string>
     <string name="submit_argument">Submit Argument</string>

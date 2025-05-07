@@ -20,6 +20,7 @@ class DebateBoardViewModel(application: Application) : AndroidViewModel(applicat
 
     private val repositoryProvider = RepositoryProvider.getInstance(application)
     private val debateRepository = repositoryProvider.debateRepository
+    private val userRepository = repositoryProvider.userRepository
     private val sessionManager = com.argumentor.SessionManager(application)
 
     /**
@@ -57,7 +58,31 @@ class DebateBoardViewModel(application: Application) : AndroidViewModel(applicat
                 debateRepository.getAllDebates().collect { debateEntities ->
                     // Convertir entidades a modelos de dominio
                     allDebates = debateEntities.map { entity -> 
-                        DataMappers.toDebate(entity)
+                        val debate = DataMappers.toDebate(entity)
+                        
+                        // Obtener nombre de usuario para el autor
+                        var authorName = "Desconocido"
+                        try {
+                            val authorUserId = entity.authorUserId
+                            if (!authorUserId.isNullOrEmpty()) {
+                                val authorUser = userRepository.getUserById(authorUserId)
+                                if (authorUser != null) {
+                                    // Usar username si está disponible, sino usar name
+                                    authorName = if (!authorUser.username.isNullOrEmpty()) {
+                                        authorUser.username
+                                    } else {
+                                        authorUser.name
+                                    }
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Timber.e(e, "Error al obtener usuario autor: ${e.message}")
+                        }
+                        
+                        // Crear copia del debate con el nombre de usuario en lugar del ID
+                        debate.copy(
+                            author = authorName
+                        )
                     }
                     
                     // Aplicar filtros
@@ -77,28 +102,101 @@ class DebateBoardViewModel(application: Application) : AndroidViewModel(applicat
      *
      * @param title Título del debate.
      * @param description Descripción del debate.
+     * @param position Posición del creador en el debate ("A_FAVOR" o "EN_CONTRA").
      * @param category Categoría del debate (opcional).
      */
-    fun addDebate(title: String, description: String, category: String? = null) {
+    fun addDebate(title: String, description: String, position: String = "A_FAVOR", category: String? = null) {
         viewModelScope.launch {
             try {
                 val currentUserId = sessionManager.getUserId()
+                if (currentUserId == null) {
+                    Timber.e("No se puede crear debate sin usuario autenticado")
+                    return@launch
+                }
                 
-                // Por ahora, usamos el mismo usuario para ambos participantes
-                // En una implementación real, esto debería gestionarse en otra parte
+                // Configurar las posiciones según la selección del usuario
+                val participantFavorId = if (position == "A_FAVOR") currentUserId else ""
+                val participantContraId = if (position == "EN_CONTRA") currentUserId else ""
+                
                 debateRepository.createDebate(
                     title = title,
                     description = description,
                     authorUserId = currentUserId,
-                    participantFavorUserId = currentUserId ?: "anonymous",
-                    participantContraUserId = currentUserId ?: "anonymous",
+                    participantFavorUserId = participantFavorId,
+                    participantContraUserId = participantContraId,
                     category = category
                 )
                 
-                Timber.d("Debate añadido: $title")
+                Timber.d("Debate añadido: $title, posición: $position")
                 // La lista se actualizará automáticamente a través del Flow del repository
             } catch (e: Exception) {
                 Timber.e(e, "Error al añadir debate")
+            }
+        }
+    }
+    
+    /**
+     * Añade un usuario como participante en un debate existente.
+     * 
+     * @param debateId ID del debate al que unirse
+     * @param position Posición en el debate (opcional, determinará automáticamente si no se especifica)
+     */
+    fun joinDebate(debateId: String, position: String? = null) {
+        viewModelScope.launch {
+            try {
+                val currentUserId = sessionManager.getUserId() ?: return@launch
+                val debate = debateRepository.getDebateById(debateId) ?: return@launch
+                
+                // Verificar si el usuario ya está participando
+                if (debate.participantFavorUserId == currentUserId || 
+                    debate.participantContraUserId == currentUserId) {
+                    Timber.d("El usuario ya está participando en este debate")
+                    return@launch
+                }
+                
+                // Determinar la posición disponible automáticamente si no se especifica
+                val joinPosition = position ?: if (debate.participantFavorUserId.isEmpty()) {
+                    "A_FAVOR"
+                } else if (debate.participantContraUserId.isEmpty()) {
+                    "EN_CONTRA"
+                } else {
+                    // No hay posiciones disponibles
+                    Timber.d("No hay posiciones disponibles en este debate")
+                    return@launch
+                }
+                
+                // Actualizar el debate con el nuevo participante
+                val updatedDebate = when (joinPosition) {
+                    "A_FAVOR" -> {
+                        if (debate.participantFavorUserId.isNotEmpty()) {
+                            Timber.d("La posición A_FAVOR ya está ocupada")
+                            return@launch
+                        }
+                        debate.copy(participantFavorUserId = currentUserId)
+                    }
+                    "EN_CONTRA" -> {
+                        if (debate.participantContraUserId.isNotEmpty()) {
+                            Timber.d("La posición EN_CONTRA ya está ocupada")
+                            return@launch
+                        }
+                        debate.copy(participantContraUserId = currentUserId)
+                    }
+                    else -> debate
+                }
+                
+                // Actualizar estado si ahora tiene ambos participantes
+                val finalDebate = if (updatedDebate.participantFavorUserId.isNotEmpty() && 
+                                      updatedDebate.participantContraUserId.isNotEmpty()) {
+                    updatedDebate.copy(status = "ACTIVO")
+                } else {
+                    updatedDebate
+                }
+                
+                debateRepository.updateDebate(finalDebate)
+                Timber.d("Usuario $currentUserId se unió al debate $debateId como $joinPosition")
+                
+            } catch (e: Exception) {
+                Timber.e(e, "Error al unirse al debate")
             }
         }
     }

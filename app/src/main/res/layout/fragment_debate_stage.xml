@@ -67,6 +67,55 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Respuesta previa del oponente (visible en refutación 1, 2 y conclusión) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPrevOpponentArgument"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@id/cardStageInfo"
+                android:visibility="@{(stage == stage.REFUTACION1 || stage == stage.REFUTACION2 || stage == stage.CONCLUSION) ? View.VISIBLE : View.GONE}">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/prev_opponent_response"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/buttonTogglePrevResponse"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/show_opponent_response"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/textPrevOpponentArgument"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textIsSelectable="true"
+                        android:visibility="gone"
+                        tools:text="Esta es la respuesta previa de tu oponente..." />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Argumento del oponente (visible en refutaciones y conclusión) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardOpponentArgument"
@@ -75,8 +124,8 @@
                 android:layout_marginTop="16dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="2dp"
-                app:layout_constraintTop_toBottomOf="@id/cardStageInfo"
-                android:visibility="@{stage == stage.INTRODUCCION ? View.GONE : View.VISIBLE}">
+                app:layout_constraintTop_toBottomOf="@id/cardPrevOpponentArgument"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"

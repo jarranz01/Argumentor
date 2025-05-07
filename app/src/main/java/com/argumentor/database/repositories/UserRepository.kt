@@ -84,12 +84,6 @@ class UserRepository(
     ) {
         try {
             // Verificar que Firebase está inicializado correctamente
-            if (firebaseAuth.app == null) {
-                Timber.e("Firebase Auth no está inicializado correctamente")
-                onError(Exception("Firebase no está inicializado correctamente. Por favor reinicia la aplicación."))
-                return
-            }
-
             Timber.d("Intentando registro con Firebase: $email")
             
             // Usar Firebase Auth para registro

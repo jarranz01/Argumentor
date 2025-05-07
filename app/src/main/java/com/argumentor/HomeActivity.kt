@@ -75,8 +75,9 @@ class HomeActivity : AppCompatActivity() {
      */
     private fun setupClickListeners() {
         binding.btnMatchmaking.setOnClickListener {
-            // To-do: Navegación a pantalla de emparejamiento
-            Timber.i("Matchmaking clicked - Not implemented yet")
+            val intent = Intent(this, MatchmakingActivity::class.java)
+            startActivity(intent)
+            Timber.i("Navigate to matchmaking")
         }
 
         binding.btnDebateBoard.setOnClickListener {
@@ -86,8 +87,9 @@ class HomeActivity : AppCompatActivity() {
         }
 
         binding.btnMyDebates.setOnClickListener {
-            // To-do: Navegación a pantalla de emparejamiento
-            Timber.i("My Debates clicked - Not implemented yet")
+            val intent = Intent(this, MyDebatesActivity::class.java)
+            startActivity(intent)
+            Timber.i("Navigate to my debates")
         }
 
         binding.btnMyStances.setOnClickListener {
