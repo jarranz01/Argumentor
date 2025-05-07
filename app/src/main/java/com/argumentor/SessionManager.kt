@@ -143,7 +143,7 @@ class SessionManager(context: Context) {
      */
     fun getUsername(): String? {
         return if (isLoggedIn()) {
-            sharedPreferences.getString(KEY_USERNAME, firebaseAuth.currentUser?.email)
+            sharedPreferences.getString(KEY_USERNAME, null)
         } else {
             null
         }

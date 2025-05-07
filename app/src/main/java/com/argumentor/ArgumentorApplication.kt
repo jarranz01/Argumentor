@@ -7,12 +7,16 @@ import timber.log.Timber
 import java.util.*
 
 /**
+ * ESTA CLASE ESTÁ DESHABILITADA. 
+ * Se mantiene aquí solo por referencia pero no se usa.
+ * La implementación activa está en com.argumentor.models.ArgumentorApplication
+ *
  * Clase de aplicación personalizada para Argumentor.
  *
  * Se utiliza para inicializar configuraciones globales como el idioma de la aplicación
  * y el registro con Timber.
  */
-class ArgumentorApplication : Application() {
+class ArgumentorApplicationDISABLED : Application() {
 
     override fun onCreate() {
         super.onCreate()
@@ -21,7 +25,7 @@ class ArgumentorApplication : Application() {
         Timber.plant(Timber.DebugTree())
 
         // Aplicar el idioma guardado
-        applyLanguageFromSettings()
+        // applyLanguageFromSettings()
     }
 
     /**

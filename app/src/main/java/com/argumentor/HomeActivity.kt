@@ -21,6 +21,7 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var observer: MyObserver
+    private lateinit var sessionManager: SessionManager
 
     /**
      * Método llamado al crear la actividad. Inicializa el Data Binding y configura los listeners.
@@ -37,8 +38,33 @@ class HomeActivity : AppCompatActivity() {
         )
         
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
-
+        
+        // Inicializar sessionManager
+        sessionManager = SessionManager(this)
+        
+        // Configurar el mensaje de bienvenida personalizado
+        setupWelcomeMessage()
+        
+        // Configurar listeners para los botones
         setupClickListeners()
+    }
+    
+    /**
+     * Configura el mensaje de bienvenida personalizado con el nombre del usuario.
+     */
+    private fun setupWelcomeMessage() {
+        val username = sessionManager.getUsername()
+        
+        if (username != null) {
+            // Mostrar mensaje con nombre de usuario
+            val welcomeMessage = getString(R.string.welcome_message_with_name, username)
+            binding.tvWelcome.text = welcomeMessage
+            Timber.d("Mostrando mensaje de bienvenida para el usuario: $username")
+        } else {
+            // Si no hay sesión activa, mostrar mensaje genérico
+            binding.tvWelcome.text = getString(R.string.welcome_message)
+            Timber.d("Usuario no encontrado, mostrando mensaje de bienvenida genérico")
+        }
     }
 
     /**

@@ -107,6 +107,7 @@ class UserRepository(
                                 email = email,
                                 // Ya no necesitamos guardar la contraseña localmente
                                 password = "", 
+                                username = username,
                                 createdAt = System.currentTimeMillis()
                             )
                             
@@ -178,9 +179,10 @@ class UserRepository(
                         if (user == null) {
                             user = UserEntity(
                                 userId = firebaseUser.uid,
-                                name = firebaseUser.displayName ?: email.substringBefore("@"),
+                                name = firebaseUser.displayName ?: email,
                                 email = email,
                                 password = "",
+                                username = email.substringBefore("@"),
                                 createdAt = System.currentTimeMillis()
                             )
                             userDao.insertUser(user)
@@ -191,7 +193,11 @@ class UserRepository(
                         }
                         
                         // Sincronizar datos
-                        firebaseService.syncFromFirestore()
+                        try {
+                            firebaseService.syncFromFirestore()
+                        } catch (e: Exception) {
+                            Timber.e(e, "Error sincronizando datos durante login, continuando...")
+                        }
                         
                         Timber.d("Usuario autenticado con Firebase: ${user.userId}")
                     } catch (e: Exception) {

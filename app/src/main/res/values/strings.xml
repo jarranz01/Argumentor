@@ -62,6 +62,7 @@
 
     <!-- Home y Debate -->
     <string name="welcome_message">Welcome to Argumentor</string>
+    <string name="welcome_message_with_name">Welcome to Argumentor, %1$s</string>
     <string name="matchmaking">Matchmaking</string>
     <string name="debate_board">Debate Board</string>
     <string name="my_debates">My Debates</string>

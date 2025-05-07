@@ -24,7 +24,7 @@ interface UserDao {
     /**
      * Obtiene un usuario por su nombre de usuario.
      */
-    @Query("SELECT * FROM users WHERE name = :username LIMIT 1")
+    @Query("SELECT * FROM users WHERE username = :username LIMIT 1")
     suspend fun getUserByUsername(username: String): UserEntity?
 
     /**
