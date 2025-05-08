@@ -23,7 +23,6 @@ import timber.log.Timber
  */
 class LoginActivity : BaseLocaleActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var observer: MyObserver
     private lateinit var sessionManager: SessionManager
     private lateinit var repositoryProvider: RepositoryProvider
     
@@ -40,7 +39,7 @@ class LoginActivity : BaseLocaleActivity() {
         applyStoredLanguageConfiguration()
         
         super.onCreate(savedInstanceState)
-        observer = MyObserver(this.lifecycle, "LoginActivity")
+        MyObserver(lifecycle, "LoginActivity")
         
         Timber.d("LoginActivity.onCreate() - Inicializando Firebase...")
         

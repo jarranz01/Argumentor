@@ -23,7 +23,6 @@ import timber.log.Timber
 class FormularioActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivityFormularioBinding
-    private lateinit var observer: MyObserver
 
     /**
      * ViewModel que mantiene la información del jugador y la lista de temas.
@@ -45,7 +44,7 @@ class FormularioActivity : BaseLocaleActivity() {
         super.onCreate(savedInstanceState)
 
         // Inicializar el observador del ciclo de vida
-        observer = MyObserver(this.lifecycle, "FormularioActivity")
+        MyObserver(lifecycle, "FormularioActivity")
 
         // Inicializar el Data Binding y vincular el layout a la Activity
         binding = DataBindingUtil.setContentView(this, R.layout.activity_formulario)

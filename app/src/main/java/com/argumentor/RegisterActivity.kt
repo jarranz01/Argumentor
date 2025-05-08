@@ -32,7 +32,6 @@ import timber.log.Timber
 class RegisterActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
-    private lateinit var observer: MyObserver
     private lateinit var sessionManager: SessionManager
     private lateinit var repositoryProvider: RepositoryProvider
     
@@ -49,12 +48,7 @@ class RegisterActivity : BaseLocaleActivity() {
         applyStoredLanguageConfiguration()
         
         super.onCreate(savedInstanceState)
-
-        observer = MyObserver(
-            lifecycle,
-            "RegisterActivity",
-            this
-        )
+        MyObserver(lifecycle, "RegisterActivity")
 
         // Inicializar componentes
         sessionManager = SessionManager(this)

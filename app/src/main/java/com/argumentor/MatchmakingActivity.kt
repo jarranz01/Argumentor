@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 class MatchmakingActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivityMatchmakingBinding
-    private lateinit var observer: MyObserver
     private lateinit var sessionManager: SessionManager
     private lateinit var repositoryProvider: RepositoryProvider
     
@@ -49,11 +48,10 @@ class MatchmakingActivity : BaseLocaleActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         // Aplicar configuración de idioma antes de inflar layouts
         applyStoredLanguageConfiguration()
-        
         super.onCreate(savedInstanceState)
         
         // Inicializar el observador de ciclo de vida
-        observer = MyObserver(lifecycle, "MatchmakingActivity", this)
+        MyObserver(lifecycle, "MatchmakingActivity")
         
         // Inicializar componentes
         sessionManager = SessionManager(this)

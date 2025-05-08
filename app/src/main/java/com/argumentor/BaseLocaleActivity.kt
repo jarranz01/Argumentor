@@ -15,60 +15,48 @@ open class BaseLocaleActivity : AppCompatActivity() {
 
     /**
      * Método que se llama al adjuntar el contexto base a la actividad.
-     * Implementa la aplicación correcta del idioma almacenado en preferencias.
      */
     override fun attachBaseContext(newBase: Context) {
-        // Leer la configuración de idioma guardada
-        val preferences = newBase.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-        val languageCode = preferences.getString("language", Locale.getDefault().language) 
-            ?: Locale.getDefault().language
-        
-        try {
-            // Configurar la localización
-            val locale = Locale(languageCode)
-            Locale.setDefault(locale)
-            
-            // Crear configuración con el idioma seleccionado
-            val config = Configuration(newBase.resources.configuration)
-            config.setLocale(locale)
-            
-            // Crear un contexto con la nueva configuración
-            val updatedContext = newBase.createConfigurationContext(config)
-            
-            // Llamar al método de la clase base con el contexto actualizado
-            super.attachBaseContext(updatedContext)
-            
-            Timber.d("Idioma $languageCode aplicado en ${this.javaClass.simpleName}")
-        } catch (e: Exception) {
-            Timber.e(e, "Error en attachBaseContext de ${this.javaClass.simpleName}: ${e.message}")
-            super.attachBaseContext(newBase)
-        }
+        val languageCode = getLanguageCodeFromPrefs(newBase)
+        val updatedContext = applyLocale(newBase, languageCode)
+        super.attachBaseContext(updatedContext)
     }
     
     /**
-     * Aplica la configuración de idioma guardada en las preferencias.
-     * Este método debe ser llamado al inicio del onCreate, antes del super.onCreate
+     * Aplica la configuración de idioma guardada. Llamar al inicio del onCreate.
      */
     protected open fun applyStoredLanguageConfiguration() {
-        val preferences = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-        val languageCode = preferences.getString("language", Locale.getDefault().language) 
+        val languageCode = getLanguageCodeFromPrefs(this)
+        applyLocale(this, languageCode)
+    }
+    
+    /**
+     * Obtiene el código de idioma guardado en preferencias.
+     */
+    private fun getLanguageCodeFromPrefs(context: Context): String {
+        val preferences = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+        return preferences.getString("language", Locale.getDefault().language) 
             ?: Locale.getDefault().language
-        
-        try {
-            // Configurar la localización
+    }
+    
+    /**
+     * Aplica la configuración de localización al contexto.
+     */
+    private fun applyLocale(context: Context, languageCode: String): Context {
+        return try {
             val locale = Locale(languageCode)
             Locale.setDefault(locale)
             
-            // Crear una nueva configuración
-            val config = Configuration(resources.configuration)
+            val config = Configuration(context.resources.configuration)
             config.setLocale(locale)
             
-            // Aplicar la configuración utilizando sólo el método moderno
-            createConfigurationContext(config)
+            val updatedContext = context.createConfigurationContext(config)
+            Timber.d("Idioma $languageCode aplicado en ${this.javaClass.simpleName}")
             
-            Timber.d("Configuración de idioma $languageCode aplicada en ${this.javaClass.simpleName}")
+            updatedContext
         } catch (e: Exception) {
-            Timber.e(e, "Error al aplicar configuración de idioma en ${this.javaClass.simpleName}")
+            Timber.e(e, "Error al aplicar idioma en ${this.javaClass.simpleName}: ${e.message}")
+            context
         }
     }
 } 

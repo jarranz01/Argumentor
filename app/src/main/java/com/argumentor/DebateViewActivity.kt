@@ -36,7 +36,6 @@ class DebateViewActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivityDebateViewBinding
     private val viewModel: DebateViewModel by viewModels()
-    private lateinit var observer: MyObserver
     private lateinit var sessionManager: SessionManager
     private lateinit var repositoryProvider: RepositoryProvider
     private var isInHistoryView = false
@@ -50,7 +49,7 @@ class DebateViewActivity : BaseLocaleActivity() {
         
         try {
             // Inicializar el observador de ciclo de vida
-            observer = MyObserver(lifecycle, "DebateViewActivity", this)
+            MyObserver(lifecycle, "DebateViewActivity")
             
             // Inicializar Data Binding
             binding = DataBindingUtil.setContentView(this, R.layout.activity_debate_view)

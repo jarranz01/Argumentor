@@ -1,17 +1,16 @@
 package com.argumentor
 
-import android.app.Activity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import timber.log.Timber
 
+/**
+ * Observador del ciclo de vida para registrar eventos en Timber.
+ */
 class MyObserver(
     private val lifecycle: Lifecycle,
-    private val componentName: String,
-    private val activity: Activity? = null,
-    private val sessionTimeoutHandler: (() -> Unit)? = null,
-    private var isSessionUp: Boolean = true
+    private val componentName: String
 ) : DefaultLifecycleObserver {
 
     init {
@@ -20,28 +19,27 @@ class MyObserver(
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
-        Timber.d("$componentName - onStart called")
+        Timber.d("$componentName - onStart")
     }
 
     override fun onStop(owner: LifecycleOwner) {
         super.onStop(owner)
-        Timber.d("$componentName - onStop called")
+        Timber.d("$componentName - onStop")
     }
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
-        Timber.d("$componentName - onResume called")
+        Timber.d("$componentName - onResume")
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
         super.onDestroy(owner)
         lifecycle.removeObserver(this)
-        Timber.d("$componentName - Observer destroyed")
+        Timber.d("$componentName - onDestroy")
     }
 
     override fun onPause(owner: LifecycleOwner) {
         super.onPause(owner)
-        Timber.d("$componentName - OnPause called")
-
+        Timber.d("$componentName - onPause")
     }
 }

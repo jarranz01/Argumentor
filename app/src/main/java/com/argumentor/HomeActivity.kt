@@ -2,8 +2,6 @@ package com.argumentor
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import com.argumentor.databinding.ActivityHomeBinding
@@ -22,7 +20,6 @@ class HomeActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var sessionManager: SessionManager
-    private lateinit var observer: MyObserver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Aplicar configuración de idioma antes de inflar layouts
@@ -30,8 +27,8 @@ class HomeActivity : BaseLocaleActivity() {
         
         super.onCreate(savedInstanceState)
         
-        // Inicializar el observador del ciclo de vida
-        observer = MyObserver(lifecycle, "HomeActivity", this)
+        // Registrar observador para logs del ciclo de vida
+        MyObserver(lifecycle, "HomeActivity")
         
         // Inicializar session manager
         sessionManager = SessionManager(this)
@@ -54,63 +51,29 @@ class HomeActivity : BaseLocaleActivity() {
         Timber.i("HomeActivity creada para el usuario: ${sessionManager.getUsername() ?: "desconocido"}")
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Ya no inflamos el menú
-        return false
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                // Navegar a la pantalla de configuración
-                navigateToSettings()
-                true
-            }
-            R.id.action_logout -> {
-                // Cerrar sesión
-                logout()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     /**
      * Configura los botones de la pantalla principal
      */
     private fun setupButtons() {
-        // Botón para iniciar emparejamiento
-        binding.btnMatchmaking.setOnClickListener {
-            val intent = Intent(this, MatchmakingActivity::class.java)
-            startActivity(intent)
-            Timber.i("Navegando a MatchmakingActivity")
-        }
-
-        // Botón para ver debates en curso
-        binding.btnMyDebates.setOnClickListener {
-            val intent = Intent(this, MyDebatesActivity::class.java)
-            startActivity(intent)
-            Timber.i("Navegando a MyDebatesActivity")
-        }
-
-        // Botón para ver tablón de debates
-        binding.btnDebateBoard.setOnClickListener {
-            val intent = Intent(this, DebateBoardActivity::class.java)
-            startActivity(intent)
-            Timber.i("Navegando a DebateBoardActivity")
+        // Definir un mapa de botones y sus destinos
+        val navigationMap = mapOf(
+            binding.btnMatchmaking to MatchmakingActivity::class.java,
+            binding.btnMyDebates to MyDebatesActivity::class.java,
+            binding.btnDebateBoard to DebateBoardActivity::class.java,
+            binding.btnMyStances to FormularioActivity::class.java
+        )
+        
+        // Configurar cada botón
+        navigationMap.forEach { (button, destination) ->
+            button.setOnClickListener {
+                startActivity(Intent(this, destination))
+                Timber.i("Navegando a ${destination.simpleName}")
+            }
         }
         
-        // Botón para ver mis posturas
-        binding.btnMyStances.setOnClickListener {
-            val intent = Intent(this, FormularioActivity::class.java)
-            startActivity(intent)
-            Timber.i("Navegando a FormularioActivity (Mis posturas)")
-        }
-        
-        // Botón para ajustes
+        // Botón de ajustes con manejo especial
         binding.btnSettings.setOnClickListener {
             navigateToSettings()
-            Timber.i("Navegando a SettingsActivity desde botón")
         }
     }
 
@@ -119,10 +82,10 @@ class HomeActivity : BaseLocaleActivity() {
      */
     private fun setupWelcomeMessage() {
         val userName = sessionManager.getUsername()
-        if (!userName.isNullOrEmpty()) {
-            binding.tvWelcome.text = getString(R.string.welcome_message_with_name, userName)
+        binding.tvWelcome.text = if (!userName.isNullOrEmpty()) {
+            getString(R.string.welcome_message_with_name, userName)
         } else {
-            binding.tvWelcome.text = getString(R.string.welcome_message)
+            getString(R.string.welcome_message)
         }
     }
 
@@ -130,9 +93,9 @@ class HomeActivity : BaseLocaleActivity() {
      * Navega a la pantalla de inicio de sesión
      */
     private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
-        // Limpiar la pila de actividades para que el usuario no pueda volver atrás con el botón de retorno
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val intent = Intent(this, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
         startActivity(intent)
         finish()
         Timber.i("Navegando a LoginActivity (sesión no iniciada)")
@@ -142,8 +105,7 @@ class HomeActivity : BaseLocaleActivity() {
      * Navega a la pantalla de configuración
      */
     private fun navigateToSettings() {
-        val intent = Intent(this, SettingsActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, SettingsActivity::class.java))
         Timber.i("Navegando a SettingsActivity")
     }
 

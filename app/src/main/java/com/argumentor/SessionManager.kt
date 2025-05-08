@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import com.argumentor.models.ArgumentorApplication
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 /**
@@ -32,17 +31,17 @@ class SessionManager(context: Context) {
      * @param username Nombre de usuario
      */
     fun createSession(userId: String, username: String) {
-        with(sharedPreferences.edit()) {
+        sharedPreferences.edit().apply {
             putString(KEY_USER_ID, userId)
             putString(KEY_USERNAME, username)
             putBoolean(KEY_IS_LOGGED_IN, true)
             apply()
         }
-        Timber.d("Sesión creada para el usuario: $username (ID: $userId)")
+        Timber.d("Sesión creada para $username (ID: $userId)")
     }
     
     /**
-     * Crea una nueva cuenta de usuario con email y contraseña usando Firebase Authentication.
+     * Crea una nueva cuenta de usuario con email y contraseña.
      * 
      * @param email Email del usuario
      * @param password Contraseña del usuario
@@ -60,21 +59,21 @@ class SessionManager(context: Context) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
                 val user = authResult.user!!
-                // Guardar el nombre de usuario en SharedPreferences
                 createSession(user.uid, username)
                 onSuccess(user)
             }
             .addOnFailureListener { exception ->
-                Timber.e(exception, "Error al crear usuario con Firebase Auth")
+                Timber.e(exception, "Error al crear usuario")
                 onError(exception)
             }
     }
     
     /**
-     * Inicia sesión con email y contraseña usando Firebase Authentication.
+     * Inicia sesión con email y contraseña.
      * 
      * @param email Email del usuario
      * @param password Contraseña del usuario
+     * @param username Nombre de usuario
      * @param onSuccess Callback llamado cuando el inicio de sesión es exitoso
      * @param onError Callback llamado cuando ocurre un error
      */
@@ -88,12 +87,11 @@ class SessionManager(context: Context) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener { authResult ->
                 val user = authResult.user!!
-                // Guardar el nombre de usuario en SharedPreferences
                 createSession(user.uid, username)
                 onSuccess(user)
             }
             .addOnFailureListener { exception ->
-                Timber.e(exception, "Error al iniciar sesión con Firebase Auth")
+                Timber.e(exception, "Error al iniciar sesión")
                 onError(exception)
             }
     }
@@ -104,22 +102,23 @@ class SessionManager(context: Context) {
      * @return true si hay una sesión activa
      */
     fun isLoggedIn(): Boolean {
-        // Verificar tanto en SharedPreferences como en Firebase
         val localLoggedIn = sharedPreferences.getBoolean(KEY_IS_LOGGED_IN, false)
         val firebaseUser = firebaseAuth.currentUser
         
-        // Si hay discrepancia entre Firebase y SharedPreferences, actualizar SharedPreferences
-        if (localLoggedIn && firebaseUser == null) {
-            // Usuario dice estar logueado localmente pero no en Firebase
-            logout()
-            return false
-        } else if (!localLoggedIn && firebaseUser != null) {
-            // Usuario logueado en Firebase pero no localmente
-            createSession(firebaseUser.uid, firebaseUser.email ?: "Usuario")
-            return true
+        // Si hay discrepancia, actualizar SharedPreferences
+        return when {
+            localLoggedIn && firebaseUser == null -> {
+                // Sesión local pero no en Firebase
+                logout()
+                false
+            }
+            !localLoggedIn && firebaseUser != null -> {
+                // Sesión en Firebase pero no local
+                createSession(firebaseUser.uid, firebaseUser.email ?: "Usuario")
+                true
+            }
+            else -> localLoggedIn
         }
-        
-        return localLoggedIn
     }
     
     /**
@@ -128,12 +127,10 @@ class SessionManager(context: Context) {
      * @return ID del usuario o null si no hay sesión
      */
     fun getUserId(): String? {
-        val firebaseUser = firebaseAuth.currentUser
-        return if (isLoggedIn()) {
-            firebaseUser?.uid ?: sharedPreferences.getString(KEY_USER_ID, null)
-        } else {
-            null
-        }
+        if (!isLoggedIn()) return null
+        
+        return firebaseAuth.currentUser?.uid 
+            ?: sharedPreferences.getString(KEY_USER_ID, null)
     }
     
     /**
@@ -159,10 +156,8 @@ class SessionManager(context: Context) {
         firebaseAuth.signOut()
         
         // Limpiar datos locales
-        with(sharedPreferences.edit()) {
-            clear()
-            apply()
-        }
+        sharedPreferences.edit().clear().apply()
+        
         Timber.d("Sesión cerrada para el usuario: $username")
     }
     
