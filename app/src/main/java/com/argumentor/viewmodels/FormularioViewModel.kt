@@ -93,16 +93,22 @@ class FormularioViewModel(application: Application) : AndroidViewModel(applicati
                     emptyList()
                 }
                 
-                // Convertir entidades a modelos de dominio
+                // Convertir entidades a modelos de dominio con descripciones localizadas
                 val temas = topicEntities.map { topicEntity ->
                     val stance = userStances.firstOrNull { it.topicName == topicEntity.topicName }
                     
-                    // Resolver el nombre del tema - versión simplificada y robusta
+                    // Resolver el nombre localizado del tema
                     val nombreTema = resolveTopicName(topicEntity.topicName)
+                    
+                    // Resolver la descripción localizada o usar la de la base de datos como respaldo
+                    var descripcion = resolveTopicDescription(topicEntity.topicName)
+                    if (descripcion.isEmpty()) {
+                        descripcion = topicEntity.description
+                    }
                     
                     Tema(
                         nombre = nombreTema,
-                        descripcion = topicEntity.description,
+                        descripcion = descripcion,
                         opinionSeleccionada = stance?.stance ?: ""
                     )
                 }
@@ -125,31 +131,33 @@ class FormularioViewModel(application: Application) : AndroidViewModel(applicati
      */
     private fun resolveTopicName(topicName: String): String {
         return try {
-            when {
-                // Caso 1: Es una referencia de tipo "R.string.nombre"
-                topicName.startsWith("R.string.") -> {
-                    val resourceName = topicName.substringAfter("R.string.")
-                    val resourceId = context.resources.getIdentifier(resourceName, "string", context.packageName)
-                    if (resourceId != 0) context.getString(resourceId) else topicName
-                }
-                
-                // Caso 2: Es directamente un ID numérico
-                topicName.all { it.isDigit() } -> {
-                    val resourceId = topicName.toIntOrNull()
-                    if (resourceId != null && resourceId != 0) context.getString(resourceId) else topicName
-                }
-                
-                // Caso 3: Podría ser un identificador de recurso directo (como "marijuana")
-                else -> {
-                    // Intentar resolver como identificador de recurso
-                    val resourceId = context.resources.getIdentifier(topicName, "string", context.packageName)
-                    if (resourceId != 0) {
-                        // Si existe un recurso con ese nombre, usar el texto localizado
-                        context.getString(resourceId)
-                    } else {
-                        // Si no es un recurso, simplemente devolver el nombre original
-                        topicName
-                    }
+            // Mapeo directo de identificadores internos a recursos de strings
+            val mappedResourceName = when (topicName) {
+                "climate_change" -> R.string.climate_change
+                "nuclear_energy" -> R.string.nuclear_energy
+                "social_media" -> R.string.social_media
+                "online_education" -> R.string.online_education
+                "artificial_intelligence" -> R.string.artificial_intelligence
+                "abortion" -> R.string.abortion
+                "bullfighting" -> R.string.bullfighting
+                "film_subsidies" -> R.string.film_subsidies
+                "open_borders" -> R.string.open_borders
+                "freedom_of_speech" -> R.string.freedom_of_speech
+                "marijuana" -> R.string.marijuana
+                else -> 0 // No hay mapeo directo
+            }
+
+            if (mappedResourceName != 0) {
+                // Si tenemos un mapeo directo, usamos el recurso
+                context.getString(mappedResourceName)
+            } else {
+                // Verificar si el topicName podría ser directamente un identificador de recurso
+                val resourceId = context.resources.getIdentifier(topicName, "string", context.packageName)
+                if (resourceId != 0) {
+                    context.getString(resourceId)
+                } else {
+                    // Si todo falla, devolvemos el nombre original posiblemente formateado
+                    topicName.replace("_", " ").capitalize()
                 }
             }
         } catch (e: Exception) {
@@ -157,29 +165,96 @@ class FormularioViewModel(application: Application) : AndroidViewModel(applicati
             topicName // Si falla, devolvemos el nombre original
         }
     }
+
+    /**
+     * Función auxiliar para poner en mayúscula la primera letra
+     */
+    private fun String.capitalize(): String {
+        return if (this.isNotEmpty()) {
+            this[0].uppercase() + this.substring(1).lowercase()
+        } else {
+            this
+        }
+    }
+
+    /**
+     * Resuelve la descripción del tema a partir del identificador.
+     */
+    private fun resolveTopicDescription(topicName: String): String {
+        return try {
+            // Mapeo directo de identificadores internos a recursos de strings de descripción
+            val descriptionResourceId = when (topicName) {
+                "climate_change" -> R.string.climate_change_description
+                "nuclear_energy" -> R.string.nuclear_energy_description
+                "social_media" -> R.string.social_media_description
+                "online_education" -> R.string.online_education_description
+                "artificial_intelligence" -> R.string.artificial_intelligence_description
+                "abortion" -> R.string.abortion_description
+                "bullfighting" -> R.string.bullfighting_description
+                "film_subsidies" -> R.string.film_subsidies_description
+                "open_borders" -> R.string.open_borders_description
+                "freedom_of_speech" -> R.string.freedom_of_speech_description
+                "marijuana" -> R.string.marijuana_description
+                else -> 0 // No hay mapeo directo
+            }
+
+            if (descriptionResourceId != 0) {
+                // Si tenemos un mapeo directo, usamos el recurso
+                context.getString(descriptionResourceId)
+            } else {
+                // Intentar encontrar una descripción con el patrón <nombre>_description
+                val descriptionResId = context.resources.getIdentifier(
+                    "${topicName}_description", 
+                    "string", 
+                    context.packageName
+                )
+                if (descriptionResId != 0) {
+                    context.getString(descriptionResId)
+                } else {
+                    // Si no hay descripción localizada, devolvemos una cadena vacía
+                    // La descripción de la base de datos se cargará en loadTopicsAndStances
+                    ""
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error al resolver la descripción del tema: $topicName")
+            "" // Si falla, devolvemos cadena vacía
+        }
+    }
+
     /**
      * Asigna una postura a un tema específico.
      *
-     * @param tema El nombre del tema al que se le asignará la postura.
+     * @param temaMostrado El nombre mostrado del tema al que se le asignará la postura.
      * @param opinion La opinión seleccionada para el tema.
      */
-    fun asignarPostura(tema: String, opinion: String) {
+    fun asignarPostura(temaMostrado: String, opinion: String) {
         // Actualizar el modelo local
-        _jugador.value?.asignarPostura(tema, opinion)
+        _jugador.value?.asignarPostura(temaMostrado, opinion)
         
         // Actualizar la base de datos si hay un usuario con sesión
         currentUserId?.let { userId ->
             viewModelScope.launch {
                 try {
-                    // Obtener el topicName original desde la base de datos usando el nombre resuelto
-                    val topicEntities = topicRepository.getAllTopics().first()
-                    val originalTopicName = topicEntities.find { 
-                        resolveTopicName(it.topicName) == tema 
-                    }?.topicName ?: tema
+                    // Encontrar el tema en la lista local que coincida con el nombre mostrado
+                    val temaActual = _jugador.value?.listaTemas?.find { it.nombre == temaMostrado }
                     
-                    // Guardar la postura en la base de datos con el nombre original del tema
-                    userStanceRepository.setUserStance(userId, originalTopicName, opinion)
-                    Timber.d("Postura guardada en BD: tema=$originalTopicName, opinión=$opinion, userId=$userId")
+                    // Obtener todos los temas de la base de datos
+                    val topicEntities = topicRepository.getAllTopics().first()
+                    
+                    // Encontrar el identificador interno del tema
+                    val internalTopicName = topicEntities.find { entity -> 
+                        val nombreResuelto = resolveTopicName(entity.topicName)
+                        nombreResuelto == temaMostrado
+                    }?.topicName
+                    
+                    if (internalTopicName != null) {
+                        // Guardar la postura en la base de datos con el identificador interno
+                        userStanceRepository.setUserStance(userId, internalTopicName, opinion)
+                        Timber.d("Postura guardada en BD: tema=$internalTopicName (mostrado como $temaMostrado), opinión=$opinion, userId=$userId")
+                    } else {
+                        Timber.e("No se pudo encontrar el identificador interno para el tema mostrado: $temaMostrado")
+                    }
                 } catch (e: Exception) {
                     Timber.e(e, "Error al guardar postura en la base de datos")
                 }
@@ -189,7 +264,7 @@ class FormularioViewModel(application: Application) : AndroidViewModel(applicati
         // Actualizamos la lista filtrada para mantener coherencia
         _temasFiltrados.value = filtrarTemas(searchQuery)
         
-        Timber.d("Postura asignada: tema=$tema, opinión=$opinion")
+        Timber.d("Postura asignada: tema=$temaMostrado, opinión=$opinion")
     }
     
     /**

@@ -83,7 +83,7 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                 .addMigrations(MIGRATION_1_2) // Agregar migración
                 .fallbackToDestructiveMigration() // Como respaldo si falla la migración
-                .addCallback(AppDatabaseCallback(scope))
+                .addCallback(AppDatabaseCallback(scope, context.applicationContext))
                 .build()
                 INSTANCE = instance
                 instance
@@ -132,7 +132,8 @@ abstract class AppDatabase : RoomDatabase() {
          * Callback para operaciones durante la creación de la base de datos.
          */
         private class AppDatabaseCallback(
-            private val scope: CoroutineScope
+            private val scope: CoroutineScope,
+            private val context: Context
         ) : RoomDatabase.Callback() {
 
             override fun onCreate(db: SupportSQLiteDatabase) {
@@ -140,7 +141,7 @@ abstract class AppDatabase : RoomDatabase() {
                 Timber.d("¡Base de datos creada! Inicializando datos predeterminados...")
                 INSTANCE?.let { database ->
                     scope.launch(Dispatchers.IO) {
-                        populateDatabase(database.topicDao(), database.userDao())
+                        populateDatabase(database.topicDao(), database.userDao(), context)
                     }
                 }
             }
@@ -150,7 +151,7 @@ abstract class AppDatabase : RoomDatabase() {
                 Timber.d("¡Migración destructiva de la base de datos! Reinicializando datos...")
                 INSTANCE?.let { database ->
                     scope.launch(Dispatchers.IO) {
-                        populateDatabase(database.topicDao(), database.userDao())
+                        populateDatabase(database.topicDao(), database.userDao(), context)
                     }
                 }
             }
@@ -164,9 +165,9 @@ abstract class AppDatabase : RoomDatabase() {
         /**
          * Prepopula la base de datos con datos iniciales.
          */
-        private suspend fun populateDatabase(topicDao: TopicDao, userDao: UserDao) {
+        private suspend fun populateDatabase(topicDao: TopicDao, userDao: UserDao, context: Context) {
             // Insertar temas iniciales
-            val initialTopics = getInitialTopics()
+            val initialTopics = getInitialTopics(context)
             topicDao.insertTopics(initialTopics)
             Timber.d("Temas iniciales cargados: ${initialTopics.size} temas")
 
@@ -184,21 +185,54 @@ abstract class AppDatabase : RoomDatabase() {
 
         /**
          * Obtiene una lista de temas iniciales para prepopular la base de datos.
-         * En una implementación real, estos deberían obtenerse de resources.
+         * Las descripciones se obtienen de los recursos de la aplicación.
          */
-        private fun getInitialTopics(): List<TopicEntity> {
+        private fun getInitialTopics(context: Context): List<TopicEntity> {
             return listOf(
-                TopicEntity("climate_change", "This topic addresses the existence and reality of climate change"),
-                TopicEntity("nuclear_energy", "This topic focuses on the use of nuclear energy as a source of electricity"),
-                TopicEntity("social_media", "This topic explores the impact of daily use of social media on people's lives"),
-                TopicEntity("online_education", "This topic focuses on distance education through digital platforms"),
-                TopicEntity("artificial_intelligence", "This topic explores the ethical considerations of AI"),
-                TopicEntity("abortion", "This topic discusses the ethical, legal and social aspects of abortion"),
-                TopicEntity("bullfighting", "This topic debates the tradition versus animal rights aspects of bullfighting"),
-                TopicEntity("film_subsidies", "This topic examines whether government should subsidize film industry"),
-                TopicEntity("open_borders", "This topic discusses immigration policies and open borders"),
-                TopicEntity("freedom_of_speech", "This topic explores the limits and importance of free speech"),
-                TopicEntity("marijuana", "This topic debates the legalization of marijuana")
+                TopicEntity(
+                    "climate_change", 
+                    context.getString(R.string.climate_change_description)
+                ),
+                TopicEntity(
+                    "nuclear_energy", 
+                    context.getString(R.string.nuclear_energy_description)
+                ),
+                TopicEntity(
+                    "social_media", 
+                    context.getString(R.string.social_media_description)
+                ),
+                TopicEntity(
+                    "online_education", 
+                    context.getString(R.string.online_education_description)
+                ),
+                TopicEntity(
+                    "artificial_intelligence", 
+                    context.getString(R.string.artificial_intelligence_description)
+                ),
+                TopicEntity(
+                    "abortion", 
+                    context.getString(R.string.abortion_description)
+                ),
+                TopicEntity(
+                    "bullfighting", 
+                    context.getString(R.string.bullfighting_description)
+                ),
+                TopicEntity(
+                    "film_subsidies", 
+                    context.getString(R.string.film_subsidies_description)
+                ),
+                TopicEntity(
+                    "open_borders", 
+                    context.getString(R.string.open_borders_description)
+                ),
+                TopicEntity(
+                    "freedom_of_speech", 
+                    context.getString(R.string.freedom_of_speech_description)
+                ),
+                TopicEntity(
+                    "marijuana", 
+                    context.getString(R.string.marijuana_description)
+                )
             )
         }
     }

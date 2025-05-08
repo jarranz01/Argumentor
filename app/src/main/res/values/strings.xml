@@ -53,12 +53,25 @@
     <string name="online_education_description">This topic focuses on distance education through digital platforms. Its effectiveness, accessibility, and differences with traditional education are debated.</string>
 
     <string name="artificial_intelligence">Artificial Intelligence</string>
+    <string name="artificial_intelligence_description">This topic explores the ethical considerations of AI and its impact on society. Debates include potential benefits and risks of advanced AI systems, regulation concerns, and privacy implications.</string>
+    
     <string name="abortion">Abortion</string>
+    <string name="abortion_description">This topic discusses the ethical, legal and social aspects of abortion. It touches on bodily autonomy, rights of the unborn, and related religious and moral considerations.</string>
+    
     <string name="bullfighting">Bullfighting</string>
+    <string name="bullfighting_description">This topic debates the tradition versus animal rights aspects of bullfighting. It examines cultural heritage preservation against animal welfare concerns and the evolution of entertainment forms.</string>
+    
     <string name="film_subsidies">Film Subsidies</string>
+    <string name="film_subsidies_description">This topic examines whether government should subsidize the film industry. It explores cultural value, economic benefits, artistic diversity, and appropriate use of public funds.</string>
+    
     <string name="open_borders">Open Borders</string>
+    <string name="open_borders_description">This topic discusses immigration policies and open borders. It covers national sovereignty, human rights, economic impacts, and cultural integration challenges in a globalized world.</string>
+    
     <string name="freedom_of_speech">Freedom of Speech</string>
+    <string name="freedom_of_speech_description">This topic explores the limits and importance of free speech in society. It examines censorship, hate speech legislation, digital platforms, and balancing rights with responsibilities.</string>
+    
     <string name="marijuana">Marijuana</string>
+    <string name="marijuana_description">This topic debates the legalization of marijuana. It considers medical benefits, recreational use, public health impacts, crime and justice aspects, and regulatory frameworks.</string>
 
     <!-- Home y Debate -->
     <string name="welcome_message">Welcome to Argumentor</string>

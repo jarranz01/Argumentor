@@ -54,12 +54,25 @@
     <string name="online_education_description">Este tema se centra en la educación a distancia a través de plataformas digitales. Se debate sobre su efectividad, accesibilidad y las diferencias con la educación tradicional.</string>
 
     <string name="artificial_intelligence">Inteligencia artificial</string>
+    <string name="artificial_intelligence_description">Este tema explora las consideraciones éticas de la IA y su impacto en la sociedad. Los debates incluyen posibles beneficios y riesgos de los sistemas avanzados de IA, preocupaciones de regulación e implicaciones para la privacidad.</string>
+    
     <string name="abortion">Aborto</string>
+    <string name="abortion_description">Este tema aborda los aspectos éticos, legales y sociales del aborto. Trata sobre la autonomía corporal, los derechos del no nacido y consideraciones religiosas y morales relacionadas.</string>
+    
     <string name="bullfighting">Tauromaquia</string>
+    <string name="bullfighting_description">Este tema debate los aspectos de tradición frente a los derechos de los animales en la tauromaquia. Examina la preservación del patrimonio cultural frente a las preocupaciones por el bienestar animal y la evolución de las formas de entretenimiento.</string>
+    
     <string name="film_subsidies">Subvenciones al cine</string>
+    <string name="film_subsidies_description">Este tema examina si el gobierno debería subvencionar la industria cinematográfica. Explora el valor cultural, los beneficios económicos, la diversidad artística y el uso apropiado de fondos públicos.</string>
+    
     <string name="open_borders">Fronteras abiertas</string>
+    <string name="open_borders_description">Este tema aborda las políticas de inmigración y fronteras abiertas. Cubre la soberanía nacional, los derechos humanos, los impactos económicos y los desafíos de integración cultural en un mundo globalizado.</string>
+    
     <string name="freedom_of_speech">Libertad de expresión</string>
+    <string name="freedom_of_speech_description">Este tema explora los límites y la importancia de la libertad de expresión en la sociedad. Examina la censura, la legislación sobre el discurso de odio, las plataformas digitales y el equilibrio entre derechos y responsabilidades.</string>
+    
     <string name="marijuana">Marihuana</string>
+    <string name="marijuana_description">Este tema debate la legalización de la marihuana. Considera los beneficios médicos, el uso recreativo, los impactos en la salud pública, aspectos de crimen y justicia, y marcos regulatorios.</string>
 
     <!-- Home y Debate -->
     <string name="welcome_message">Bienvenido a Argumentor</string>
@@ -131,7 +144,7 @@
     <string name="language_spanish">Español</string>
     <string name="logout">Cerrar sesión</string>
     <string name="language_changed">Idioma cambiado. Por favor, reinicie la aplicación para que los cambios surtan efecto.</string>
-    <string name="logout_success_message">Has cerrado sesión</string>
+    <string name="logout_success">Has cerrado sesión</string>
 
     <!-- Instrucciones para las fases del debate -->
     <string name="instruction_introduction">Presenta tu postura inicial sobre el tema.</string>
