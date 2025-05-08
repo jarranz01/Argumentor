@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.argumentor.database.RepositoryProvider
 import com.argumentor.database.entities.UserEntity
@@ -30,7 +29,7 @@ import timber.log.Timber
  * 
  * Utiliza Firebase Authentication para el registro de usuarios.
  */
-class RegisterActivity : AppCompatActivity() {
+class RegisterActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
     private lateinit var observer: MyObserver
@@ -46,6 +45,9 @@ class RegisterActivity : AppCompatActivity() {
      * @param savedInstanceState Estado previo de la actividad si está siendo recreada.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Aplicar configuración de idioma antes de inflar layouts
+        applyStoredLanguageConfiguration()
+        
         super.onCreate(savedInstanceState)
 
         observer = MyObserver(

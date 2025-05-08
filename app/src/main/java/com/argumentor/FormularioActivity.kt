@@ -7,7 +7,6 @@ import android.os.Looper
 import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.argumentor.databinding.ActivityFormularioBinding
@@ -21,7 +20,7 @@ import timber.log.Timber
  * el ViewModel [FormularioViewModel]. Además, configura la toolbar, la animación de la lista
  * de temas, la asignación de posturas y la navegación a la siguiente pantalla.
  */
-class FormularioActivity : AppCompatActivity() {
+class FormularioActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivityFormularioBinding
     private lateinit var observer: MyObserver
@@ -40,6 +39,9 @@ class FormularioActivity : AppCompatActivity() {
      * @param savedInstanceState Estado previo de la Activity (si existe).
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Aplicar configuración de idioma antes de inflar layouts
+        applyStoredLanguageConfiguration()
+        
         super.onCreate(savedInstanceState)
 
         // Inicializar el observador del ciclo de vida

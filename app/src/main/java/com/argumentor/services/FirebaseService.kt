@@ -389,23 +389,34 @@ class FirebaseService(private val context: Context) {
         val currentUser = auth.currentUser ?: return
         
         scope.launch {
+            Timber.d("Iniciando sincronización desde Firestore para el usuario ${currentUser.uid}")
+            
+            // Sincronizar debates
             try {
-                // Sincronizar debates
                 val remoteDebates = getDebatesFromFirestore()
                 for (debate in remoteDebates) {
                     debateDao.insertDebate(debate)
                 }
-                
-                // Sincronizar argumentos
-                syncArgumentsFromFirestore()
-                
-                // Sincronizar posturas de usuario
-                syncUserStancesFromFirestore(currentUser.uid)
-                
-                Timber.d("Sincronización desde Firestore completada")
+                Timber.d("Sincronización de debates desde Firestore completada: ${remoteDebates.size} debates")
             } catch (e: Exception) {
-                Timber.e(e, "Error sincronizando desde Firestore")
+                Timber.e(e, "Error sincronizando debates desde Firestore")
             }
+            
+            // Sincronizar argumentos (en un bloque try-catch independiente)
+            try {
+                syncArgumentsFromFirestore()
+            } catch (e: Exception) {
+                Timber.e(e, "Error sincronizando argumentos desde Firestore")
+            }
+            
+            // Sincronizar posturas de usuario (en un bloque try-catch independiente)
+            try {
+                syncUserStancesFromFirestore(currentUser.uid)
+            } catch (e: Exception) {
+                Timber.e(e, "Error sincronizando posturas de usuario desde Firestore")
+            }
+            
+            Timber.d("Proceso de sincronización desde Firestore completado")
         }
     }
     
@@ -437,22 +448,91 @@ class FirebaseService(private val context: Context) {
      */
     private suspend fun syncUserStancesFromFirestore(userId: String) {
         try {
+            // Primer intento: buscar por userId directo
             val snapshot = firestore.collection(COLLECTION_USER_STANCES)
                 .whereEqualTo("userId", userId)
                 .get()
                 .await()
             
             val stances = snapshot.documents.mapNotNull { doc ->
-                doc.toObject(UserStanceEntity::class.java)
+                try {
+                    doc.toObject(UserStanceEntity::class.java)
+                } catch (e: Exception) {
+                    Timber.e(e, "Error al convertir documento a UserStanceEntity: ${doc.id}")
+                    null
+                }
             }
             
-            for (stance in stances) {
-                userStanceDao.insertOrUpdateStance(stance)
+            if (stances.isEmpty()) {
+                Timber.d("No se encontraron posturas para el usuario $userId en el primer intento, probando consulta general")
+                
+                // Segundo intento: obtener todas las posturas
+                try {
+                    val allStancesSnapshot = firestore.collection(COLLECTION_USER_STANCES)
+                        .get()
+                        .await()
+                        
+                    val userStances = allStancesSnapshot.documents.mapNotNull { doc ->
+                        try {
+                            val stance = doc.toObject(UserStanceEntity::class.java)
+                            if (stance?.userId == userId) stance else null
+                        } catch (e: Exception) {
+                            Timber.e(e, "Error al procesar documento de postura: ${doc.id}")
+                            null
+                        }
+                    }
+                    
+                    if (userStances.isNotEmpty()) {
+                        Timber.d("Se encontraron ${userStances.size} posturas en la consulta general")
+                        for (stance in userStances) {
+                            userStanceDao.insertOrUpdateStance(stance)
+                        }
+                    } else {
+                        Timber.d("No se encontraron posturas en la consulta general")
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Error en la consulta general de posturas")
+                }
+            } else {
+                // Guardar las posturas del primer intento exitoso
+                Timber.d("Se encontraron ${stances.size} posturas en el primer intento")
+                for (stance in stances) {
+                    userStanceDao.insertOrUpdateStance(stance)
+                }
             }
             
-            Timber.d("Posturas de usuario sincronizadas desde Firestore: ${stances.size} posturas")
+            Timber.d("Sincronización de posturas de usuario completada")
         } catch (e: Exception) {
             Timber.e(e, "Error sincronizando posturas de usuario desde Firestore")
+            
+            // Intento de recuperación
+            try {
+                Timber.d("Intentando recuperación para sincronizar posturas")
+                delay(1000) // Esperar un segundo
+                
+                val recoverySnapshot = firestore.collection(COLLECTION_USER_STANCES)
+                    .limit(50) // Limitar a 50 documentos para evitar problemas
+                    .get()
+                    .await()
+                
+                val userStances = recoverySnapshot.documents.mapNotNull { doc ->
+                    try {
+                        val stance = doc.toObject(UserStanceEntity::class.java)
+                        if (stance?.userId == userId) stance else null
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+                
+                if (userStances.isNotEmpty()) {
+                    Timber.d("Recuperación exitosa: se encontraron ${userStances.size} posturas")
+                    for (stance in userStances) {
+                        userStanceDao.insertOrUpdateStance(stance)
+                    }
+                }
+            } catch (recoveryException: Exception) {
+                Timber.e(recoveryException, "Error en intento de recuperación")
+            }
         }
     }
     

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name" translatable="false">Argumentor</string>
+
     <!-- Textos comunes -->
     <string name="ok">Aceptar</string>
     <string name="understood">Entendido</string>
@@ -90,6 +92,8 @@
     <string name="join_position">Unirse como %1$s</string>
     <string name="debate_full">El debate está completo</string>
     <string name="select_your_position">Selecciona tu posición:</string>
+    <string name="position_favor">A favor</string>
+    <string name="position_against">En contra</string>
     <string name="position_available">Posición disponible: %1$s</string>
     <string name="create">Crear</string>
     <string name="cancel">Cancelar</string>
@@ -113,8 +117,6 @@
     <string name="stage_refutation1">Primera Refutación</string>
     <string name="stage_refutation2">Segunda Refutación</string>
     <string name="stage_conclusion">Conclusión</string>
-    <string name="position_favor">A favor</string>
-    <string name="position_against">En contra</string>
     <string name="opponents_argument">Argumento del oponente:</string>
     <string name="your_response">Tu respuesta:</string>
     <string name="submit_argument">Enviar Argumento</string>
@@ -129,7 +131,7 @@
     <string name="language_spanish">Español</string>
     <string name="logout">Cerrar sesión</string>
     <string name="language_changed">Idioma cambiado. Por favor, reinicie la aplicación para que los cambios surtan efecto.</string>
-    <string name="logout_success">Has cerrado sesión</string>
+    <string name="logout_success_message">Has cerrado sesión</string>
 
     <!-- Instrucciones para las fases del debate -->
     <string name="instruction_introduction">Presenta tu postura inicial sobre el tema.</string>
@@ -141,4 +143,9 @@
     <string name="argument_history">Historial de argumentos</string>
     <string name="view_history">Ver historial</string>
     <string name="back_to_debate">Volver al debate</string>
+    
+    <!-- Preference strings -->
+    <string name="preferences_general">Configuración General</string>
+    <string name="preferences_account">Configuración de Cuenta</string>
+    <string name="language_summary">Idioma actual: %1$s</string>
 </resources>

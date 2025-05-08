@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/debateStageFragment">
+
+    <fragment
+        android:id="@+id/debateStageFragment"
+        android:name="com.argumentor.fragments.DebateStageFragment"
+        android:label="fragment_debate_stage"
+        tools:layout="@layout/fragment_debate_stage">
+        <argument
+            android:name="debate_stage"
+            app:argType="com.argumentor.models.DebateStage" />
+        <action
+            android:id="@+id/action_to_argumentHistory"
+            app:destination="@id/argumentHistoryFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/argumentHistoryFragment"
+        android:name="com.argumentor.fragments.ArgumentHistoryFragment"
+        android:label="fragment_argument_history"
+        tools:layout="@layout/fragment_argument_history">
+        <argument
+            android:name="debate_id"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_to_debateStage"
+            app:destination="@id/debateStageFragment" />
+    </fragment>
+</navigation> 

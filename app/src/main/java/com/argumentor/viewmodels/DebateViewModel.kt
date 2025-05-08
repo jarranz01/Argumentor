@@ -43,6 +43,12 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
     val debate: LiveData<Debate> = _debate
 
     /**
+     * Flag para controlar si el debate ha sido cargado completamente
+     */
+    private val _debateLoaded = MutableLiveData<Boolean>(false)
+    val debateLoaded: LiveData<Boolean> = _debateLoaded
+
+    /**
      * Entradas del debate, organizadas por etapa y posición
      */
     private val _debateEntries = MutableLiveData<Map<DebateStage, Map<DebatePosition, DebateEntry>>>()
@@ -118,11 +124,20 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
                 _debate.value = loadedDebate
                 
                 // Determinar la posición del usuario actual
-                userPosition = if (userId == loadedDebate.participantFavor) {
-                    DebatePosition.A_FAVOR
-                } else {
-                    DebatePosition.EN_CONTRA
+                userPosition = when (userId) {
+                    loadedDebate.participantFavor -> DebatePosition.A_FAVOR
+                    loadedDebate.participantContra -> DebatePosition.EN_CONTRA
+                    else -> {
+                        // Log del error para depuración
+                        Timber.e("Error: Usuario $userId no está asignado a ninguna posición en debate $debateId")
+                        Timber.e("participantFavor: ${loadedDebate.participantFavor}, participantContra: ${loadedDebate.participantContra}")
+                        
+                        // Asignar una posición por defecto en caso de error
+                        DebatePosition.A_FAVOR
+                    }
                 }
+                
+                Timber.d("Posición del usuario $userId establecida como: $userPosition")
                 
                 // Cargar las entradas del debate
                 try {
@@ -132,6 +147,9 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
                     _errorMessage.value = "Error al cargar las entradas: ${e.message}"
                     _isLoading.value = false
                 }
+                
+                // Marcar el debate como cargado completamente
+                _debateLoaded.value = true
                 
             } catch (e: Exception) {
                 Timber.e(e, "Error al cargar el debate")
@@ -421,9 +439,24 @@ class DebateViewModel(application: Application) : AndroidViewModel(application) 
      * @return La posición del usuario (A_FAVOR o EN_CONTRA)
      */
     fun getUserPosition(): DebatePosition {
-        // Si userPosition no está inicializada, devolver un valor por defecto
+        // Si userPosition no está inicializada, devolver un valor por defecto y registrar
         if (!::userPosition.isInitialized) {
-            Timber.w("getUserPosition llamado antes de inicializar userPosition, devolviendo valor por defecto")
+            Timber.w("getUserPosition llamado antes de inicializar userPosition")
+            
+            // Intentar determinar la posición a partir del debate cargado
+            val currentDebate = _debate.value
+            if (currentDebate != null) {
+                return when (userId) {
+                    currentDebate.participantFavor -> DebatePosition.A_FAVOR
+                    currentDebate.participantContra -> DebatePosition.EN_CONTRA
+                    else -> {
+                        Timber.w("No se puede determinar la posición del usuario $userId en el debate")
+                        DebatePosition.A_FAVOR
+                    }
+                }
+            }
+            
+            Timber.w("No hay datos de debate disponibles, devolviendo valor por defecto")
             return DebatePosition.A_FAVOR
         }
         return userPosition

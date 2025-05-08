@@ -2,10 +2,11 @@ package com.argumentor
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.argumentor.database.RepositoryProvider
 import com.argumentor.databinding.ActivityLoginBinding
@@ -20,7 +21,7 @@ import timber.log.Timber
  * Permite a los usuarios ingresar con su email y contraseña usando Firebase Authentication,
  * o navegar a la pantalla de registro si no tienen una cuenta.
  */
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseLocaleActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var observer: MyObserver
     private lateinit var sessionManager: SessionManager
@@ -35,6 +36,9 @@ class LoginActivity : AppCompatActivity() {
      * @param savedInstanceState Estado previo de la actividad si está siendo recreada.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Aplicar configuración de idioma antes de inflar layouts
+        applyStoredLanguageConfiguration()
+        
         super.onCreate(savedInstanceState)
         observer = MyObserver(this.lifecycle, "LoginActivity")
         
@@ -136,6 +140,14 @@ class LoginActivity : AppCompatActivity() {
                 // Guardar datos de sesión con el nombre de usuario específico
                 sessionManager.createSession(user.userId, user.username.ifEmpty { user.name })
                 
+                // Sincronizar datos desde Firebase después de iniciar sesión
+                try {
+                    repositoryProvider.firebaseService.syncFromFirestore()
+                    Timber.d("Sincronización iniciada después del login")
+                } catch (e: Exception) {
+                    Timber.e(e, "Error al iniciar sincronización después del login")
+                }
+                
                 showLoading(false)
                 Timber.i("Login successful with Firebase: ${user.email}")
                 Toast.makeText(
@@ -143,7 +155,11 @@ class LoginActivity : AppCompatActivity() {
                     getString(R.string.login_successful),
                     Toast.LENGTH_SHORT
                 ).show()
-                navigateToHome()
+                
+                // Esperar un momento para permitir que la sincronización comience
+                Handler(Looper.getMainLooper()).postDelayed({
+                    navigateToHome()
+                }, 500) // Pequeño retraso para permitir que la sincronización inicie
             },
             onError = { exception ->
                 showLoading(false)

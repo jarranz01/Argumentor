@@ -1,36 +1,34 @@
 package com.argumentor
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.argumentor.databinding.ActivitySettingsBinding
+import com.argumentor.fragments.SettingsFragment
 import timber.log.Timber
 import java.util.Locale
 
 /**
  * Actividad para gestionar la configuración del usuario.
  *
- * Esta actividad proporciona opciones para cambiar el idioma de la aplicación (inglés/español)
- * y cerrar sesión en la sesión actual.
+ * Esta actividad aloja el SettingsFragment que implementa PreferenceFragmentCompat
+ * para proporcionar una interfaz de preferencias moderna utilizando la biblioteca de preferencias
+ * de Android Jetpack.
  */
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
     private lateinit var observer: MyObserver
-    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Aplicar configuración de idioma antes de inflar layouts
+        applyStoredLanguageConfiguration()
+        
         super.onCreate(savedInstanceState)
 
         // Inicializar el observador para el registro del ciclo de vida
         observer = MyObserver(lifecycle, "SettingsActivity", this)
-
-        // Inicializar el gestor de sesión para manejar el cierre de sesión
-        sessionManager = SessionManager(this)
 
         // Configurar el enlace de datos (data binding)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_settings)
@@ -40,140 +38,76 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        // Establecer la selección basada en la configuración actual del idioma
-        setupLanguageSelection()
-
-        // Configurar el botón de cierre de sesión
-        setupLogoutButton()
-    }
-
-    /**
-     * Configura el grupo de botones de radio para la selección de idioma.
-     */
-    private fun setupLanguageSelection() {
-        // Obtener la configuración regional actual para establecer el botón de radio correcto
-        val currentLanguage = getCurrentLanguage()
+        // Cargar el fragmento de preferencias si no se ha cargado previamente
+        if (savedInstanceState == null) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.settings_container, SettingsFragment())
+                .commit()
+        }
         
-        Timber.d("Idioma actual detectado: $currentLanguage")
-
-        // Seleccionar el botón de radio apropiado según el idioma actual
-        if (currentLanguage.startsWith("es")) {
-            binding.radioSpanish.isChecked = true
-            binding.radioEnglish.isChecked = false
-            Timber.d("Seleccionando español en los radio buttons")
-        } else {
-            // Por defecto, inglés para cualquier otro idioma
-            binding.radioEnglish.isChecked = true
-            binding.radioSpanish.isChecked = false
-            Timber.d("Seleccionando inglés en los radio buttons (por defecto)")
-        }
-
-        // Establecer el listener para los cambios de idioma
-        binding.radioGroupLanguage.setOnCheckedChangeListener { _, checkedId ->
-            val languageCode = when (checkedId) {
-                R.id.radioSpanish -> "es"
-                else -> "en"
-            }
-
-            // Evitar cambiar al mismo idioma
-            if (languageCode == currentLanguage) {
-                Timber.d("El idioma seleccionado es el mismo que el actual: $languageCode")
-                return@setOnCheckedChangeListener
-            }
-
-            // Guardar la preferencia de idioma seleccionada
-            changeLanguage(languageCode)
-
-            // Notificar al usuario
-            Toast.makeText(
-                this,
-                getString(R.string.language_changed),
-                Toast.LENGTH_LONG
-            ).show()
-
-            Timber.d("Preferencia de idioma cambiada a: $languageCode")
-
-            // Reiniciar la aplicación para aplicar los cambios de idioma correctamente
-            restartApp()
-        }
+        Timber.d("SettingsActivity creada con SettingsFragment")
     }
-
+    
     /**
-     * Configura el botón de cierre de sesión.
+     * Método que se llama al adjuntar el contexto base a la actividad.
+     * Es el mejor lugar para aplicar configuraciones de localización.
      */
-    private fun setupLogoutButton() {
-        binding.btnLogout.setOnClickListener {
-            // Cerrar sesión usando el gestor de sesión
-            sessionManager.logout()
-
-            // Mostrar mensaje de confirmación
-            Toast.makeText(
-                this,
-                getString(R.string.logout_success),
-                Toast.LENGTH_SHORT
-            ).show()
-
-            Timber.i("Usuario cerró sesión")
-
-            // Navegar a la actividad de inicio de sesión y limpiar la pila de actividades
-            val intent = Intent(this, LoginActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-            startActivity(intent)
-            finish()
-        }
-    }
-
-    /**
-     * Cambia el idioma de la aplicación.
-     *
-     * @param languageCode El código de idioma ISO a establecer (por ejemplo, "en" o "es")
-     */
-    private fun changeLanguage(languageCode: String) {
-        // Guardar el idioma seleccionado en las preferencias compartidas
-        val preferences = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-        preferences.edit().apply {
-            putString("language", languageCode)
-            commit() // Usar commit en lugar de apply para asegurar escritura inmediata
-        }
-
-        // Aplicar la nueva configuración regional
-        val locale = Locale(languageCode)
-        Locale.setDefault(locale)
-
-        // Crear una nueva configuración con el idioma seleccionado
-        val config = Configuration(resources.configuration)
-        config.setLocale(locale)
-        
-        // Crear un nuevo contexto con la configuración actualizada (método recomendado)
-        createConfigurationContext(config)
-        
-        // No usar resources.updateConfiguration() porque está deprecado
-        
-        Timber.d("Idioma cambiado a $languageCode en SettingsActivity")
-    }
-
-    /**
-     * Reinicia la aplicación para aplicar los cambios de idioma.
-     */
-    private fun restartApp() {
-        // Crear un intent para reiniciar la actividad principal
-        val intent = Intent(this, HomeActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        startActivity(intent)
-        finish()
-    }
-
-    /**
-     * Obtiene el código de idioma actual de las preferencias compartidas.
-     * Si no hay un idioma guardado, utiliza el idioma del sistema como predeterminado.
-     *
-     * @return El código de idioma ISO (por ejemplo, "en" o "es")
-     */
-    private fun getCurrentLanguage(): String {
-        val preferences = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-        return preferences.getString("language", Locale.getDefault().language) 
+    override fun attachBaseContext(newBase: Context) {
+        // Leer la configuración de idioma guardada
+        val preferences = newBase.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+        val languageCode = preferences.getString("language", Locale.getDefault().language) 
             ?: Locale.getDefault().language
+        
+        try {
+            // Configurar la localización
+            val locale = Locale(languageCode)
+            Locale.setDefault(locale)
+            
+            // Crear configuración con el idioma seleccionado
+            val config = Configuration(newBase.resources.configuration)
+            config.setLocale(locale)
+            
+            // Crear un contexto con la nueva configuración
+            val updatedContext = newBase.createConfigurationContext(config)
+            
+            // Llamar al método de la clase base con el contexto actualizado
+            super.attachBaseContext(updatedContext)
+            
+            Timber.d("Idioma aplicado en attachBaseContext: $languageCode")
+        } catch (e: Exception) {
+            Timber.e(e, "Error en attachBaseContext: ${e.message}")
+            super.attachBaseContext(newBase)
+        }
+    }
+    
+    /**
+     * Aplica la configuración de idioma guardada en las preferencias.
+     */
+    override protected fun applyStoredLanguageConfiguration() {
+        val preferences = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+        val languageCode = preferences.getString("language", Locale.getDefault().language) 
+            ?: Locale.getDefault().language
+        
+        try {
+            // Configurar la localización
+            val locale = Locale(languageCode)
+            Locale.setDefault(locale)
+            
+            // Crear una nueva configuración
+            val config = Configuration(resources.configuration)
+            config.setLocale(locale)
+            
+            // Aplicar la configuración utilizando sólo el método moderno (no-deprecated)
+            // Esto crea un contexto con la nueva configuración
+            val context = createConfigurationContext(config)
+            
+            // Nota: No usamos updateConfiguration porque está deprecado
+            // La configuración de idioma se aplicará totalmente cuando se reinicie la aplicación
+            
+            Timber.d("Configuración de idioma aplicada en SettingsActivity: $languageCode")
+        } catch (e: Exception) {
+            Timber.e(e, "Error al aplicar configuración de idioma")
+        }
     }
 }

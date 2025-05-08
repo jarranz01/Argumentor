@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.argumentor.database.RepositoryProvider
 import com.argumentor.database.entities.UserStanceEntity
@@ -27,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Esta actividad busca otros usuarios que tengan posturas opuestas a las del usuario actual
  * y crea automáticamente un debate cuando encuentra una coincidencia.
  */
-class MatchmakingActivity : AppCompatActivity() {
+class MatchmakingActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivityMatchmakingBinding
     private lateinit var observer: MyObserver
@@ -48,6 +47,9 @@ class MatchmakingActivity : AppCompatActivity() {
     private var dotCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Aplicar configuración de idioma antes de inflar layouts
+        applyStoredLanguageConfiguration()
+        
         super.onCreate(savedInstanceState)
         
         // Inicializar el observador de ciclo de vida

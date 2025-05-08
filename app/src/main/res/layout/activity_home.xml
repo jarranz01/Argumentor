@@ -2,98 +2,105 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tvWelcome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/welcome_message"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/btnMatchmaking"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnMatchmaking"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:padding="16dp"
-            android:text="@string/matchmaking"
-            android:textSize="16sp"
-            app:icon="@drawable/ic_matchmaking"
-            app:iconGravity="textStart"
-            app:layout_constraintBottom_toTopOf="@+id/btnMyDebates"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvWelcome" />
+            <TextView
+                android:id="@+id/tvWelcome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/welcome_message"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:gravity="center"
+                app:layout_constraintBottom_toTopOf="@+id/btnMatchmaking"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnMyDebates"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:padding="16dp"
-            android:text="@string/my_debates"
-            android:textSize="16sp"
-            app:icon="@drawable/ic_my_debates"
-            app:iconGravity="textStart"
-            app:layout_constraintBottom_toTopOf="@+id/btnDebateBoard"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnMatchmaking" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMatchmaking"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:padding="16dp"
+                android:text="@string/matchmaking"
+                android:textSize="16sp"
+                app:icon="@drawable/ic_matchmaking"
+                app:iconGravity="textStart"
+                app:layout_constraintBottom_toTopOf="@+id/btnMyDebates"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvWelcome" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDebateBoard"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:padding="16dp"
-            android:text="@string/debate_board"
-            android:textSize="16sp"
-            app:icon="@drawable/ic_debate_board"
-            app:iconGravity="textStart"
-            app:layout_constraintBottom_toTopOf="@+id/btnMyStances"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnMyDebates" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMyDebates"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:padding="16dp"
+                android:text="@string/my_debates"
+                android:textSize="16sp"
+                app:icon="@drawable/ic_my_debates"
+                app:iconGravity="textStart"
+                app:layout_constraintBottom_toTopOf="@+id/btnDebateBoard"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnMatchmaking" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnMyStances"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:padding="16dp"
-            android:text="@string/my_stances"
-            android:textSize="16sp"
-            app:icon="@drawable/ic_my_stances"
-            app:iconGravity="textStart"
-            app:layout_constraintBottom_toTopOf="@+id/btnSettings"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnDebateBoard" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDebateBoard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:padding="16dp"
+                android:text="@string/debate_board"
+                android:textSize="16sp"
+                app:icon="@drawable/ic_debate_board"
+                app:iconGravity="textStart"
+                app:layout_constraintBottom_toTopOf="@+id/btnMyStances"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnMyDebates" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSettings"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:padding="16dp"
-            android:text="@string/settings"
-            android:textSize="16sp"
-            app:icon="@drawable/ic_settings"
-            app:iconGravity="textStart"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnMyStances" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMyStances"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:padding="16dp"
+                android:text="@string/my_stances"
+                android:textSize="16sp"
+                app:icon="@drawable/ic_my_stances"
+                app:iconGravity="textStart"
+                app:layout_constraintBottom_toTopOf="@+id/btnSettings"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnDebateBoard" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSettings"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:padding="16dp"
+                android:text="@string/settings"
+                android:textSize="16sp"
+                app:icon="@drawable/ic_settings"
+                app:iconGravity="textStart"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnMyStances" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

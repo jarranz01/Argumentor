@@ -32,7 +32,7 @@ import java.util.Locale
  * Esta actividad muestra las diferentes etapas del debate en pestañas separadas,
  * permitiendo al usuario navegar entre ellas e interactuar según corresponda en cada fase.
  */
-class DebateViewActivity : AppCompatActivity() {
+class DebateViewActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivityDebateViewBinding
     private val viewModel: DebateViewModel by viewModels()
@@ -43,7 +43,7 @@ class DebateViewActivity : AppCompatActivity() {
     private var debateId: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Asegurarnos de que estamos usando la configuración de idioma correcta
+        // Aplicar configuración de idioma antes de inflar layouts
         applyStoredLanguageConfiguration()
         
         super.onCreate(savedInstanceState)
@@ -140,50 +140,60 @@ class DebateViewActivity : AppCompatActivity() {
      * Navega al fragmento de historial de argumentos.
      */
     private fun navigateToHistoryFragment() {
-        // Ocultar ViewPager y TabLayout
-        binding.viewPager.visibility = android.view.View.GONE
-        binding.tabLayout.visibility = android.view.View.GONE
-        
-        val fragmentManager = supportFragmentManager
-        val transaction = fragmentManager.beginTransaction()
-        
-        // Añadir animación de transición
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-        
-        // Reemplazar el contenido con el fragmento de historial
-        transaction.replace(
-            R.id.fragmentContainer, 
-            ArgumentHistoryFragment.newInstance(debateId)
-        )
-        
-        transaction.commit()
-        
-        // Actualizar estado
-        isInHistoryView = true
-        invalidateOptionsMenu()
+        try {
+            // Ocultar ViewPager y TabLayout
+            binding.viewPager.visibility = android.view.View.GONE
+            binding.tabLayout.visibility = android.view.View.GONE
+            
+            val fragmentManager = supportFragmentManager
+            val transaction = fragmentManager.beginTransaction()
+            
+            // Añadir animación de transición
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+            
+            // Reemplazar el contenido con el fragmento de historial
+            transaction.replace(
+                R.id.fragmentContainer, 
+                ArgumentHistoryFragment.newInstance(debateId)
+            )
+            
+            transaction.commit()
+            
+            // Actualizar estado
+            isInHistoryView = true
+            invalidateOptionsMenu()
+        } catch (e: Exception) {
+            Timber.e(e, "Error al navegar al fragmento de historial")
+            Toast.makeText(this, "Error al mostrar el historial", Toast.LENGTH_SHORT).show()
+        }
     }
 
     /**
      * Vuelve a los fragmentos de debate (ViewPager con tabs).
      */
     private fun navigateToDebateFragments() {
-        // Mostrar ViewPager y TabLayout
-        binding.viewPager.visibility = android.view.View.VISIBLE
-        binding.tabLayout.visibility = android.view.View.VISIBLE
-        
-        val fragmentManager = supportFragmentManager
-        val transaction = fragmentManager.beginTransaction()
-        
-        // Remover el fragmento de historial
-        val historyFragment = fragmentManager.findFragmentById(R.id.fragmentContainer)
-        if (historyFragment != null) {
-            transaction.remove(historyFragment)
-            transaction.commit()
+        try {
+            // Mostrar ViewPager y TabLayout
+            binding.viewPager.visibility = android.view.View.VISIBLE
+            binding.tabLayout.visibility = android.view.View.VISIBLE
+            
+            val fragmentManager = supportFragmentManager
+            val transaction = fragmentManager.beginTransaction()
+            
+            // Remover el fragmento de historial
+            val historyFragment = fragmentManager.findFragmentById(R.id.fragmentContainer)
+            if (historyFragment != null) {
+                transaction.remove(historyFragment)
+                transaction.commit()
+            }
+            
+            // Actualizar estado
+            isInHistoryView = false
+            invalidateOptionsMenu()
+        } catch (e: Exception) {
+            Timber.e(e, "Error al navegar a los fragmentos de debate")
+            Toast.makeText(this, "Error al volver al debate", Toast.LENGTH_SHORT).show()
         }
-        
-        // Actualizar estado
-        isInHistoryView = false
-        invalidateOptionsMenu()
     }
 
     /**
@@ -301,7 +311,7 @@ class DebateViewActivity : AppCompatActivity() {
     /**
      * Aplica la configuración de idioma guardada en las preferencias.
      */
-    private fun applyStoredLanguageConfiguration() {
+    override protected fun applyStoredLanguageConfiguration() {
         val preferences = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
         val languageCode = preferences.getString("language", Locale.getDefault().language) 
             ?: Locale.getDefault().language

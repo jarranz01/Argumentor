@@ -107,13 +107,24 @@ class DebateStageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        setupStageInfo()
+        // Set initial position display
+        setupInitialDisplay()
+        
+        // Setup the rest of the UI components
         setupPreviousOpponentResponse()
         setupResponseArea()
         checkCompletionStatus()
         
         // Configurar actualización periódica para detectar respuestas del oponente
         setupPeriodicUpdates()
+        
+        // Observar si el debate se ha cargado completamente para actualizar la UI
+        viewModel.debateLoaded.observe(viewLifecycleOwner) { isLoaded ->
+            if (isLoaded) {
+                // Actualizar la información de posición cuando el debate esté completamente cargado
+                setupStageInfo()
+            }
+        }
         
         // Observar cambios que puedan afectar a la visualización
         viewModel.debateEntries.observe(viewLifecycleOwner) { entries ->
@@ -127,9 +138,9 @@ class DebateStageFragment : Fragment() {
     }
     
     /**
-     * Configura la información sobre la etapa actual y posición.
+     * Configura una visualización inicial mientras se carga el debate.
      */
-    private fun setupStageInfo() {
+    private fun setupInitialDisplay() {
         try {
             // Establecer el título según la etapa
             val stageTitle = when (debateStage) {
@@ -140,24 +151,32 @@ class DebateStageFragment : Fragment() {
             }
             binding.textStage.text = stageTitle
             
-            // Establecer instrucciones
-            try {
-                // Establecer instrucciones usando directamente los recursos del fragmento
-                val instructionText = when (debateStage) {
-                    DebateStage.INTRODUCCION -> getString(R.string.instruction_introduction)
-                    DebateStage.REFUTACION1 -> getString(R.string.instruction_refutation1)
-                    DebateStage.REFUTACION2 -> getString(R.string.instruction_refutation2)
-                    DebateStage.CONCLUSION -> getString(R.string.instruction_conclusion)
-                }
-                binding.textInstructions.text = instructionText
-            } catch (e: Exception) {
-                Timber.e(e, "Error al obtener instrucciones para la etapa")
-                binding.textInstructions.text = ""
+            // Establecer instrucciones usando directamente los recursos del fragmento
+            val instructionText = when (debateStage) {
+                DebateStage.INTRODUCCION -> getString(R.string.instruction_introduction)
+                DebateStage.REFUTACION1 -> getString(R.string.instruction_refutation1)
+                DebateStage.REFUTACION2 -> getString(R.string.instruction_refutation2)
+                DebateStage.CONCLUSION -> getString(R.string.instruction_conclusion)
             }
+            binding.textInstructions.text = instructionText
             
-            // Configurar el chip de posición de forma segura
+            // No mostrar la posición aún, se actualizará cuando el debate esté cargado
+            binding.chipPosition.visibility = View.INVISIBLE
+            
+        } catch (e: Exception) {
+            Timber.e(e, "Error en setupInitialDisplay")
+        }
+    }
+    
+    /**
+     * Configura la información sobre la etapa actual y posición.
+     */
+    private fun setupStageInfo() {
+        try {
+            // La etapa ya fue establecida en setupInitialDisplay, solo necesitamos actualizar la posición
+            
             try {
-                // Configurar el chip de posición inmediatamente con la posición actual
+                // Configurar el chip de posición con la posición actual
                 val userPosition = viewModel.getUserPosition()
                 val positionText = when (userPosition) {
                     DebatePosition.A_FAVOR -> getString(R.string.position_favor)
@@ -177,10 +196,15 @@ class DebateStageFragment : Fragment() {
                     binding.chipPosition.chipBackgroundColor = 
                         ContextCompat.getColorStateList(requireContext(), colorRes)
                 }
+                
+                // Ahora que tenemos la posición correcta, mostrar el chip
+                binding.chipPosition.visibility = View.VISIBLE
+                
             } catch (e: Exception) {
                 Timber.e(e, "Error al configurar el chip de posición")
                 // Configurar un valor por defecto para evitar UI vacía
                 binding.chipPosition.text = getString(R.string.position_favor)
+                binding.chipPosition.visibility = View.VISIBLE
             }
         } catch (e: Exception) {
             Timber.e(e, "Error en setupStageInfo")

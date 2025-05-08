@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.argumentor.adapters.DebateAdapter
@@ -24,7 +23,7 @@ import timber.log.Timber
  * crear nuevos debates mediante un botón flotante. También se configura la toolbar
  * y se observa el ViewModel para actualizar la lista de debates.
  */
-class DebateBoardActivity : AppCompatActivity() {
+class DebateBoardActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivityDebateBoardBinding
     private val viewModel: DebateBoardViewModel by viewModels()
@@ -39,6 +38,9 @@ class DebateBoardActivity : AppCompatActivity() {
      * @param savedInstanceState Estado anterior de la Activity.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Aplicar configuración de idioma antes de inflar layouts
+        applyStoredLanguageConfiguration()
+        
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_debate_board)
 

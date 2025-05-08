@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,7 +17,7 @@ import timber.log.Timber
  * Activity para mostrar la lista de debates en los que participa el usuario.
  * Muestra los debates separados en dos secciones: debates en curso y debates completados.
  */
-class MyDebatesActivity : AppCompatActivity() {
+class MyDebatesActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivityMyDebatesBinding
     private val viewModel: MyDebatesViewModel by viewModels()
@@ -26,6 +25,9 @@ class MyDebatesActivity : AppCompatActivity() {
     private lateinit var completedAdapter: DebateAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Aplicar configuración de idioma antes de inflar layouts
+        applyStoredLanguageConfiguration()
+        
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_my_debates)
         binding.lifecycleOwner = this

@@ -1,210 +1,165 @@
 package com.argumentor
 
-import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.argumentor.database.RepositoryProvider
 import com.argumentor.databinding.ActivityHomeBinding
 import timber.log.Timber
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.*
 
 /**
- * Actividad principal que sirve como hub de navegación para las diferentes funcionalidades de la app.
- * 
- * Esta actividad muestra los botones principales para acceder a:
- * - Emparejamiento (Matchmaking)
- * - Tablero de debates (Debate Board)
- * - Mis debates (My Debates)
- * - Mis posturas (My Stances)
- * - Ajustes (Settings)
+ * Actividad principal de la aplicación que se muestra después del inicio de sesión.
+ *
+ * Proporciona acceso a las principales funcionalidades de la aplicación como:
+ * - Iniciar un emparejamiento para un debate
+ * - Ver los debates en curso
+ * - Acceder a la configuración
+ * - Cerrar sesión
  */
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : BaseLocaleActivity() {
 
     private lateinit var binding: ActivityHomeBinding
-    private lateinit var observer: MyObserver
     private lateinit var sessionManager: SessionManager
-    private lateinit var repositoryProvider: RepositoryProvider
+    private lateinit var observer: MyObserver
 
-    /**
-     * Método llamado al crear la actividad. Inicializa el Data Binding y configura los listeners.
-     * 
-     * @param savedInstanceState Estado previo de la actividad si está siendo recreada.
-     */
-    override fun onCreate(savedInstanceState: Bundle?) {        
-        // Asegurarnos de que estamos usando la configuración de idioma correcta
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // Aplicar configuración de idioma antes de inflar layouts
         applyStoredLanguageConfiguration()
         
         super.onCreate(savedInstanceState)
         
-        // Inicializar el observador de ciclo de vida
+        // Inicializar el observador del ciclo de vida
         observer = MyObserver(lifecycle, "HomeActivity", this)
         
-        // Verificar si hay sesión activa
+        // Inicializar session manager
         sessionManager = SessionManager(this)
+        
+        // Verificar si el usuario ha iniciado sesión
         if (!sessionManager.isLoggedIn()) {
             navigateToLogin()
             return
         }
         
-        // Inicializar el repositorio
-        repositoryProvider = RepositoryProvider.getInstance(this)
-        
-        // Sincronizar datos con Firebase
-        syncDataWithFirebase()
-        
-        // Inicializar Data Binding
+        // Configurar data binding
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         
-        // Configurar la UI
-        setupUI()
-    }
-    
-    /**
-     * Aplica la configuración de idioma guardada en las preferencias.
-     */
-    private fun applyStoredLanguageConfiguration() {
-        val preferences = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-        val languageCode = preferences.getString("language", Locale.getDefault().language) 
-            ?: Locale.getDefault().language
+        // Configurar los botones
+        setupButtons()
         
-        val locale = Locale(languageCode)
-        Locale.setDefault(locale)
+        // Configurar el mensaje de bienvenida
+        setupWelcomeMessage()
         
-        val config = Configuration(resources.configuration)
-        config.setLocale(locale)
-        
-        // Crear un nuevo contexto con la configuración actualizada (método recomendado)
-        createConfigurationContext(config)
-        
-        Timber.d("Configuración de idioma aplicada en HomeActivity: $languageCode")
+        Timber.i("HomeActivity creada para el usuario: ${sessionManager.getUsername() ?: "desconocido"}")
     }
 
-    /**
-     * Configura el mensaje de bienvenida personalizado con el nombre del usuario.
-     */
-    private fun setupWelcomeMessage() {
-        val username = sessionManager.getUsername()
-        
-        if (username != null) {
-            // Mostrar mensaje con nombre de usuario
-            val welcomeMessage = getString(R.string.welcome_message_with_name, username)
-            binding.tvWelcome.text = welcomeMessage
-            Timber.d("Mostrando mensaje de bienvenida para el usuario: $username")
-        } else {
-            // Si no hay sesión activa, mostrar mensaje genérico
-            binding.tvWelcome.text = getString(R.string.welcome_message)
-            Timber.d("Usuario no encontrado, mostrando mensaje de bienvenida genérico")
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Ya no inflamos el menú
+        return false
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                // Navegar a la pantalla de configuración
+                navigateToSettings()
+                true
+            }
+            R.id.action_logout -> {
+                // Cerrar sesión
+                logout()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
     /**
-     * Configura los listeners para los botones de la interfaz.
-     * 
-     * Cada botón maneja la navegación a una actividad diferente o muestra un mensaje
-     * si la funcionalidad no está implementada aún.
+     * Configura los botones de la pantalla principal
      */
-    private fun setupClickListeners() {
+    private fun setupButtons() {
+        // Botón para iniciar emparejamiento
         binding.btnMatchmaking.setOnClickListener {
             val intent = Intent(this, MatchmakingActivity::class.java)
             startActivity(intent)
-            Timber.i("Navigate to matchmaking")
+            Timber.i("Navegando a MatchmakingActivity")
         }
 
-        binding.btnDebateBoard.setOnClickListener {
-            val intent = Intent(this, DebateBoardActivity::class.java)
-            startActivity(intent)
-            Timber.i("Navigate to debate board")
-        }
-
+        // Botón para ver debates en curso
         binding.btnMyDebates.setOnClickListener {
             val intent = Intent(this, MyDebatesActivity::class.java)
             startActivity(intent)
-            Timber.i("Navigate to my debates")
+            Timber.i("Navegando a MyDebatesActivity")
         }
 
+        // Botón para ver tablón de debates
+        binding.btnDebateBoard.setOnClickListener {
+            val intent = Intent(this, DebateBoardActivity::class.java)
+            startActivity(intent)
+            Timber.i("Navegando a DebateBoardActivity")
+        }
+        
+        // Botón para ver mis posturas
         binding.btnMyStances.setOnClickListener {
             val intent = Intent(this, FormularioActivity::class.java)
             startActivity(intent)
-            Timber.i("Navigate to my stances")
+            Timber.i("Navegando a FormularioActivity (Mis posturas)")
         }
-
+        
+        // Botón para ajustes
         binding.btnSettings.setOnClickListener {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-            Timber.i("Navigate to settings")
+            navigateToSettings()
+            Timber.i("Navegando a SettingsActivity desde botón")
         }
     }
 
     /**
-     * Sincroniza los datos locales con Firebase.
-     * Esto asegura que los datos estén actualizados al iniciar la aplicación.
+     * Configura el mensaje de bienvenida con el nombre del usuario
      */
-    private fun syncDataWithFirebase() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                // Verificar si el usuario está autenticado
-                val firebaseUser = repositoryProvider.firebaseService.auth.currentUser
-                if (firebaseUser == null) {
-                    Timber.e("Firebase Auth: Usuario no autenticado, la sincronización será cancelada")
-                    runOnUiThread {
-                        Toast.makeText(
-                            this@HomeActivity,
-                            "Error de sincronización: No hay usuario autenticado en Firebase",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    return@launch
-                } else {
-                    Timber.d("Firebase Auth: Usuario autenticado correctamente - ${firebaseUser.uid}")
-                }
-                
-                // Sincronizar datos desde Firebase a la base de datos local
-                repositoryProvider.firebaseService.syncFromFirestore()
-                
-                // También enviar datos locales a Firebase
-                repositoryProvider.firebaseService.syncAllData()
-                
-                Timber.d("Sincronización con Firebase completada en HomeActivity")
-                runOnUiThread {
-                    Toast.makeText(
-                        this@HomeActivity,
-                        "Sincronización con Firebase completada",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Error al sincronizar con Firebase en HomeActivity")
-                runOnUiThread {
-                    Toast.makeText(
-                        this@HomeActivity,
-                        "Error al sincronizar con Firebase: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
+    private fun setupWelcomeMessage() {
+        val userName = sessionManager.getUsername()
+        if (!userName.isNullOrEmpty()) {
+            binding.tvWelcome.text = getString(R.string.welcome_message_with_name, userName)
+        } else {
+            binding.tvWelcome.text = getString(R.string.welcome_message)
         }
     }
 
-    private fun setupUI() {
-        // Configurar el mensaje de bienvenida personalizado
-        setupWelcomeMessage()
-        
-        // Configurar listeners para los botones
-        setupClickListeners()
-    }
-
+    /**
+     * Navega a la pantalla de inicio de sesión
+     */
     private fun navigateToLogin() {
-        // Implementa la navegación a la actividad de inicio de sesión
-        // Por ejemplo, usando un Intent
         val intent = Intent(this, LoginActivity::class.java)
+        // Limpiar la pila de actividades para que el usuario no pueda volver atrás con el botón de retorno
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+        Timber.i("Navegando a LoginActivity (sesión no iniciada)")
+    }
+
+    /**
+     * Navega a la pantalla de configuración
+     */
+    private fun navigateToSettings() {
+        val intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent)
+        Timber.i("Navegando a SettingsActivity")
+    }
+
+    /**
+     * Cierra la sesión del usuario y navega a la pantalla de inicio de sesión
+     */
+    private fun logout() {
+        // Cierra la sesión
+        sessionManager.logout()
+        
+        // Muestra un mensaje de despedida
+        Toast.makeText(this, R.string.logout_success, Toast.LENGTH_SHORT).show()
+        
+        // Navega a la pantalla de inicio de sesión
+        navigateToLogin()
+        
+        Timber.i("Sesión cerrada correctamente")
     }
 }

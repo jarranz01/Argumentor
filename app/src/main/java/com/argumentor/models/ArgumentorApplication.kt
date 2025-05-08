@@ -150,10 +150,21 @@ class ArgumentorApplication : Application() {
             if (FirebaseApp.getApps(this).isEmpty()) {
                 // Inicialización normal
                 FirebaseApp.initializeApp(this)
-                Timber.d("Firebase inicializado correctamente")
+                
+                // Configurar el locale para Firebase
+                val currentLocale = resources.configuration.locales.get(0)
+                // Usar método alternativo en lugar del deprecado setDataCollectionDefaultEnabled
+                FirebaseApp.getInstance().apply {
+                    setAutomaticResourceManagementEnabled(true)
+                }
+                
+                Timber.d("Firebase inicializado correctamente con locale: ${currentLocale.language}")
             } else {
                 // Recuperar la instancia existente
-                FirebaseApp.getInstance()
+                val app = FirebaseApp.getInstance()
+                // Usar método alternativo en lugar del deprecado setDataCollectionDefaultEnabled
+                app.setAutomaticResourceManagementEnabled(true)
+                
                 Timber.d("Usando instancia existente de Firebase")
             }
         } catch (e: Exception) {

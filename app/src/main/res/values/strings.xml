@@ -143,4 +143,9 @@
     <string name="instruction_refutation2">Refute your opponent\'s first refutation.</string>
     <string name="instruction_conclusion">Present your final conclusion based on the previous arguments.</string>
 
+    <!-- Preference strings -->
+    <string name="preferences_general">General Settings</string>
+    <string name="preferences_account">Account Settings</string>
+    <string name="language_summary">Current language: %1$s</string>
+
 </resources>
